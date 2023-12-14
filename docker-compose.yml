@@ -1,0 +1,22 @@
+version: '3.4'
+
+services:
+  authmicroservice:
+    image: ${DOCKER_REGISTRY-}authmicroservice
+    build:
+      context: .
+      dockerfile: Auth/Dockerfile
+
+  recipemicroservice:
+    image: ${DOCKER_REGISTRY-}recipemicroservice
+    build:
+      context: .
+      dockerfile: Recipe/Dockerfile
+
+
+  reviewmicroservice:
+    image: ${DOCKER_REGISTRY-}reviewmicroservice
+    build:
+      context: .
+      dockerfile: Review/Dockerfile
+
