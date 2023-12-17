@@ -4,12 +4,12 @@
       "commandName": "DockerCompose",
       "commandVersion": "1.0",
       "composeLaunchAction": "LaunchBrowser",
-      "composeLaunchServiceName": "authmicroservice",
+      "composeLaunchServiceName": "authmicroservice.api",
       "composeLaunchUrl": "{Scheme}://localhost:{ServicePort}/swagger",
       "serviceActions": {
-        "authmicroservice": "StartDebugging",
-        "recipemicroservice": "StartDebugging",
-        "reviewmicroservice": "StartDebugging"
+        "authmicroservice.api": "StartDebugging",
+        "recipemicroservice.api": "StartDebugging",
+        "reviewmicroservice.api": "StartDebugging"
       }
     }
   }

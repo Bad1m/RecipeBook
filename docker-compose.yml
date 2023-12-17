@@ -1,22 +1,22 @@
 version: '3.4'
 
 services:
-  authmicroservice:
-    image: ${DOCKER_REGISTRY-}authmicroservice
+  authmicroservice.api:
+    image: ${DOCKER_REGISTRY-}authmicroserviceapi
     build:
       context: .
-      dockerfile: Auth/Dockerfile
+      dockerfile: Microservices/AuthMicroservice/AuthMicroservice.API/Dockerfile
 
-  recipemicroservice:
-    image: ${DOCKER_REGISTRY-}recipemicroservice
+  recipemicroservice.api:
+    image: ${DOCKER_REGISTRY-}recipemicroserviceapi
     build:
       context: .
-      dockerfile: Recipe/Dockerfile
+      dockerfile: Microservices/RecipeMicroservice/RecipeMicroservice.API/Dockerfile
 
 
-  reviewmicroservice:
-    image: ${DOCKER_REGISTRY-}reviewmicroservice
+  reviewmicroservice.api:
+    image: ${DOCKER_REGISTRY-}reviewmicroserviceapi
     build:
       context: .
-      dockerfile: Review/Dockerfile
+      dockerfile: Microservices/ReviewMicroservice/ReviewMicroservice.API/Dockerfile
 
