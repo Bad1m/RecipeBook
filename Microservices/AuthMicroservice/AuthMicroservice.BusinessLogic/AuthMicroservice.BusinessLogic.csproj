@@ -7,10 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Filters\" />
-    <Folder Include="Services\" />
-    <Folder Include="Models\" />
-    <Folder Include="Interfaces\" />
+    <PackageReference Include="AutoMapper" Version="12.0.1" />
   </ItemGroup>
 
   <ItemGroup>

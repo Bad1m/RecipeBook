@@ -4,21 +4,22 @@ FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
 USER app
 WORKDIR /app
 EXPOSE 8080
+EXPOSE 8081
 
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["Recipe/RecipeMicroservice.csproj", "Recipe/"]
-RUN dotnet restore "./Recipe/./RecipeMicroservice.csproj"
+COPY ["Microservices/RecipeMicroservice/RecipeMicroservice.API/RecipeMicroservice.API.csproj", "Microservices/RecipeMicroservice/RecipeMicroservice.API/"]
+RUN dotnet restore "./Microservices/RecipeMicroservice/RecipeMicroservice.API/./RecipeMicroservice.API.csproj"
 COPY . .
-WORKDIR "/src/Recipe"
-RUN dotnet build "./RecipeMicroservice.csproj" -c $BUILD_CONFIGURATION -o /app/build
+WORKDIR "/src/Microservices/RecipeMicroservice/RecipeMicroservice.API"
+RUN dotnet build "./RecipeMicroservice.API.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./RecipeMicroservice.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "./RecipeMicroservice.API.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "RecipeMicroservice.dll"]
+ENTRYPOINT ["dotnet", "RecipeMicroservice.API.dll"]
