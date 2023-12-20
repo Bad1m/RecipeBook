@@ -4,6 +4,7 @@ services:
   authmicroservice.api:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
+      - DOTNET_RUNNING_IN_CONTAINER=true 
     ports:
       - "8080"
       - "8081"

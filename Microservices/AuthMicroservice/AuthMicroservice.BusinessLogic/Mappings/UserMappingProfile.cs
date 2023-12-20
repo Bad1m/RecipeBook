@@ -9,6 +9,8 @@ namespace AuthMicroservice.BusinessLogic.Mappings
         public UserMappingProfile()
         {
             CreateMap<UserRegistrationDto, User>();
+            CreateMap<User, UserDto>();
+            CreateMap<UserDto, User>();
         }
     }
 }

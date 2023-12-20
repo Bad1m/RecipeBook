@@ -2,6 +2,7 @@
 using AuthMicroservice.BusinessLogic.Mappings;
 using AuthMicroservice.BusinessLogic.Models;
 using AuthMicroservice.BusinessLogic.Services;
+using AuthMicroservice.BusinessLogic.Validators;
 using AuthMicroservice.DataAccess.Data;
 using AuthMicroservice.DataAccess.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -17,22 +18,26 @@ namespace AuthMicroservice.API.Extensions
     {
         public static void RegisterDependencies(this IServiceCollection services)
         {
-            services.AddScoped<IUserContext, UserContext>();
+            services.AddScoped<IUserRegistrationDtoValidator, UserRegistrationDtoValidator>();
+            services.AddScoped<IUserLoginDtoValidator, UserLoginDtoValidator>();
             services.AddScoped<IJWTService, JWTService>();
-            services.AddScoped<IUserAuthenticationService, UserAuthenticationService>();
+            services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IAuthenticationService, AuthenticationService>();
             services.AddAutoMapper(typeof(UserMappingProfile));
         }
 
         public static void ConfigureSqlContext(this IServiceCollection services, IConfiguration configuration)
         {
-            services.AddDbContext<AuthContext>(
-            opts => opts.UseSqlServer(configuration.GetConnectionString("DefaultConnection"),
-                b => b.MigrationsAssembly("AuthMicroservice.DataAccess")));
+            var isDocker = Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER") == "true";
+            var connectionString = isDocker ? configuration.GetConnectionString("DockerConnection") : configuration.GetConnectionString("DefaultConnection");
+            services.AddDbContext<AuthContext>(opts =>
+                opts.UseSqlServer(connectionString, sqlServerOptions =>
+                    sqlServerOptions.MigrationsAssembly("AuthMicroservice.DataAccess"))
+                    .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking));
             var serviceProvider = services.BuildServiceProvider();
             var authContext = serviceProvider.GetRequiredService<AuthContext>();
             authContext.Database.EnsureCreated();
         }
-        
 
         public static void ConfigureJWT(this IServiceCollection services, IConfiguration configuration)
         {
@@ -62,13 +67,13 @@ namespace AuthMicroservice.API.Extensions
 
         public static void ConfigureIdentity(this IServiceCollection services)
         {
-            var builder = services.AddIdentity<User, IdentityRole>(o =>
+            var builder = services.AddIdentity<User, IdentityRole>(options =>
             {
-                o.Password.RequireDigit = false;
-                o.Password.RequireLowercase = false;
-                o.Password.RequireUppercase = false;
-                o.Password.RequireNonAlphanumeric = false;
-                o.User.RequireUniqueEmail = true;
+                options.Password.RequireDigit = false;
+                options.Password.RequireLowercase = false;
+                options.Password.RequireUppercase = false;
+                options.Password.RequireNonAlphanumeric = false;
+                options.User.RequireUniqueEmail = true;
             })
             .AddEntityFrameworkStores<AuthContext>()
             .AddDefaultTokenProviders();
@@ -76,16 +81,16 @@ namespace AuthMicroservice.API.Extensions
 
         public static void ConfigureSwagger(this IServiceCollection services)
         {
-            services.AddSwaggerGen(c =>
+            services.AddSwaggerGen(swaggerGenOptions =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo
+                swaggerGenOptions.SwaggerDoc("v1", new OpenApiInfo
                 {
                     Title = "Auth API",
                     Version = "v1",
                     Description = "Recipe API Services."
                 });
-                c.ResolveConflictingActions(apiDescriptions => apiDescriptions.First());
-                c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                swaggerGenOptions.ResolveConflictingActions(apiDescriptions => apiDescriptions.First());
+                swaggerGenOptions.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                 {
                     Name = "Authorization",
                     Type = SecuritySchemeType.ApiKey,
@@ -95,7 +100,7 @@ namespace AuthMicroservice.API.Extensions
                     Description = "JWT Authorization header using the Bearer scheme."
                 });
 
-                c.AddSecurityRequirement(new OpenApiSecurityRequirement
+                swaggerGenOptions.AddSecurityRequirement(new OpenApiSecurityRequirement
             {
                 {
                     new OpenApiSecurityScheme

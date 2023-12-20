@@ -1,6 +1,8 @@
-﻿using AuthMicroservice.BusinessLogic.Interfaces;
+﻿using AuthMicroservice.BusinessLogic.Dtos;
+using AuthMicroservice.BusinessLogic.Interfaces;
 using AuthMicroservice.BusinessLogic.Models;
 using AuthMicroservice.DataAccess.Models;
+using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -15,39 +17,73 @@ namespace AuthMicroservice.BusinessLogic.Services
     {
         private readonly UserManager<User> _userManager;
         private readonly AuthSettings _authSettings;
-        private readonly IUserContext _userContext;
+        private readonly IMapper _mapper;
 
-        public JWTService(UserManager<User> userManager, AuthSettings authSettings, IUserContext userContext)
+        public JWTService(UserManager<User> userManager, AuthSettings authSettings, IMapper mapper)
         {
             _userManager = userManager;
             _authSettings = authSettings;
-            _userContext = userContext;
+            _mapper = mapper;
         }
 
-        public SigningCredentials GetSigningCredentials()
+        public async Task<TokenModel> CreateTokenAsync(UserDto userDto)
+        {
+            var signingCredentials = GetSigningCredentials();
+            var claims = await GetClaimsAsync(userDto);
+            var tokenOptions = GenerateTokenOptions(signingCredentials, claims);
+            await UpdateRefreshTokenIfExpiredAsync(userDto);
+            var accessToken = new JwtSecurityTokenHandler().WriteToken(tokenOptions);
+
+            return new TokenModel
+            {
+                AccessToken = accessToken,
+                RefreshToken = userDto.RefreshToken
+            };
+        }
+
+        public async Task<string> RenewAccessTokenAsync(string refreshToken)
+        {
+            var user = await _userManager.Users.FirstOrDefaultAsync(u => u.RefreshToken == refreshToken);
+
+            if (user == null)
+            {
+                throw new InvalidOperationException("User not found for the given refresh token.");
+            }
+
+            var signingCredentials = GetSigningCredentials();
+            var claims = await GetClaimsAsync(_mapper.Map<UserDto>(user));
+            var tokenOptions = GenerateTokenOptions(signingCredentials, claims);
+            await UpdateRefreshTokenIfExpiredAsync(_mapper.Map<UserDto>(user));
+
+            return new JwtSecurityTokenHandler().WriteToken(tokenOptions);
+        }
+
+
+        private SigningCredentials GetSigningCredentials()
         {
             var key = Encoding.UTF8.GetBytes(_authSettings.Secret);
             var secret = new SymmetricSecurityKey(key);
+
             return new SigningCredentials(secret, SecurityAlgorithms.HmacSha256);
         }
 
-        public async Task<List<Claim>> GetClaims()
+        private async Task<List<Claim>> GetClaimsAsync(UserDto userDto)
         {
-            var _user = _userContext.CurrentUser;
-
             var claims = new List<Claim>
         {
-            new Claim(ClaimTypes.Name, _user.UserName)
+            new Claim(ClaimTypes.Name, userDto.UserName)
         };
-            var roles = await _userManager.GetRolesAsync(_user);
+            var roles = await _userManager.GetRolesAsync(_mapper.Map<User>(userDto));
+
             foreach (var role in roles)
             {
                 claims.Add(new Claim(ClaimTypes.Role, role));
             }
+
             return claims;
         }
 
-        public JwtSecurityToken GenerateTokenOptions(SigningCredentials signingCredentials, List<Claim> claims)
+        private JwtSecurityToken GenerateTokenOptions(SigningCredentials signingCredentials, List<Claim> claims)
         {
             var tokenOptions = new JwtSecurityToken
             (
@@ -55,43 +91,18 @@ namespace AuthMicroservice.BusinessLogic.Services
             expires: DateTime.UtcNow.Add(_authSettings.ExpiresIn),
             signingCredentials: signingCredentials
             );
+
             return tokenOptions;
         }
     
-        public async Task<(string accessToken, string refreshToken)> CreateTokenAsync()
+        private async Task UpdateRefreshTokenIfExpiredAsync(UserDto userDto)
         {
-            var signingCredentials = GetSigningCredentials();
-            var claims = await GetClaims();
-            var tokenOptions = GenerateTokenOptions(signingCredentials, claims);
-            await UpdateRefreshTokenIfExpiredAsync();
-            var accessToken = new JwtSecurityTokenHandler().WriteToken(tokenOptions);
-            return (accessToken, _userContext.CurrentUser.RefreshToken);
-        }
-
-        public async Task<string> RenewAccessTokenAsync(string refreshToken)
-        {
-            var user = await _userManager.Users.FirstOrDefaultAsync(u => u.RefreshToken == refreshToken);
-            if (user == null)
-            {
-                return null;
-            }
-
-            _userContext.CurrentUser = user;
-            var signingCredentials = GetSigningCredentials();
-            var claims = await GetClaims();
-            var tokenOptions = GenerateTokenOptions(signingCredentials, claims);
-            await UpdateRefreshTokenIfExpiredAsync();
-            return new JwtSecurityTokenHandler().WriteToken(tokenOptions);
-        }
-
-        private async Task UpdateRefreshTokenIfExpiredAsync()
-        {
-            if (string.IsNullOrEmpty(_userContext.CurrentUser.RefreshToken) || _userContext.CurrentUser.RefreshTokenExpiryTime <= DateTime.UtcNow)
+            if (string.IsNullOrEmpty(userDto.RefreshToken) || userDto.RefreshTokenExpiryTime <= DateTime.UtcNow)
             {
                 var newRefreshToken = GenerateRefreshToken();
-                _userContext.CurrentUser.RefreshToken = newRefreshToken;
-                _userContext.CurrentUser.RefreshTokenExpiryTime = DateTime.UtcNow.Add(_authSettings.RefreshTokenValidityInDays);
-                await _userManager.UpdateAsync(_userContext.CurrentUser);
+                userDto .RefreshToken = newRefreshToken;
+                userDto.RefreshTokenExpiryTime = DateTime.UtcNow.Add(_authSettings.RefreshTokenValidityInDays);
+                await _userManager.UpdateAsync(_mapper.Map<User>(userDto));
             }
         }
 
@@ -101,6 +112,7 @@ namespace AuthMicroservice.BusinessLogic.Services
             using (var rng = RandomNumberGenerator.Create())
             {
                 rng.GetBytes(randomNumber);
+
                 return Convert.ToBase64String(randomNumber);
             }
         }

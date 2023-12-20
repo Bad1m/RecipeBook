@@ -1,34 +1,29 @@
-﻿using AuthMicroservice.BusinessLogic.Interfaces;
-using AuthMicroservice.BusinessLogic.Models;
-using Microsoft.AspNetCore.Diagnostics;
+﻿using Microsoft.AspNetCore.Diagnostics;
+using Newtonsoft.Json;
 using System.Net;
 
 namespace AuthMicroservice.API.Extensions
 {
     public static class ExceptionMiddlewareExtension
     {
-        public static void ConfigureExceptionHandler(this IApplicationBuilder app)
+        public static IApplicationBuilder ConfigureExceptionHandler(this IApplicationBuilder app)
         {
-            app.UseExceptionHandler(
-                appError =>
+            app.UseExceptionHandler(errorApp =>
+            {
+                errorApp.Run(async context =>
                 {
-                    appError.Run(async context =>
-                    {
-                        context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
-                        context.Response.ContentType = "application/json";
+                    context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+                    context.Response.ContentType = "application/json";
+                    var ex = context.Features.Get<IExceptionHandlerFeature>()?.Error;
 
-                        var contextFeature = context.Features.Get<IExceptionHandlerFeature>();
-                        if (contextFeature != null)
-                        {
-                            await context.Response.WriteAsync(
-                                new ResponseModel()
-                                {
-                                    StatusCode = context.Response.StatusCode,
-                                    Message = "Internal Server Error."
-                                }.ToString());
-                        }
-                    });
+                    if (ex != null)
+                    {
+                        await context.Response.WriteAsync(JsonConvert.SerializeObject(new { error = ex.Message }));
+                    }
                 });
+            });
+
+            return app;
         }
     }
 }

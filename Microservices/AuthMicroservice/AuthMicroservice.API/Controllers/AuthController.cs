@@ -4,50 +4,49 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace AuthMicroservice.API.Controllers
 {
-    [Route("api/authentication")]
+    [Route("api/auth")]
     [ApiController]
     public class AuthController : ControllerBase
     {
         private readonly IJWTService _jwtService;
-        private readonly IUserAuthenticationService _userAuthenticationService;
+        private readonly IAuthenticationService _userAuthenticationService;
 
-        public AuthController(IUserAuthenticationService userAuthenticationService, IJWTService jwtService)
+        public AuthController(IAuthenticationService userAuthenticationService, IJWTService jwtService)
         {
             _userAuthenticationService = userAuthenticationService;
             _jwtService = jwtService;
         }
 
-        [HttpPost]
-        public async Task<IActionResult> RegisterUser([FromBody] UserRegistrationDto userRegistration)
+        [HttpPost("register/user")]
+        public async Task<IActionResult> RegisterUserAsync([FromBody] UserRegistrationDto userRegistration)
         {
-            var userResult = await _userAuthenticationService.RegisterUserAsync(userRegistration);
-            return !userResult.Succeeded ? new BadRequestObjectResult(userResult) : StatusCode(201);
+            await _userAuthenticationService.RegisterUserAsync(userRegistration);
+
+            return Ok(userRegistration);
+        }
+
+        [HttpPost("register/admin")]
+        public async Task<IActionResult> RegisterAdminAsync([FromBody] UserRegistrationDto adminRegistration)
+        {
+            await _userAuthenticationService.RegisterAdminAsync(adminRegistration);
+
+            return Ok(adminRegistration);
         }
 
         [HttpPost("login")]
-        public async Task<IActionResult> Authenticate([FromBody] UserLoginDto user)
+        public async Task<IActionResult> LoginAsync([FromBody] UserLoginDto user)
         {
-            var authResult = await _userAuthenticationService.IsValidUserAsync(user);
-            if (!authResult)
-            {
-                return Unauthorized();
-            }
-            var (accessToken, refreshToken) = await _jwtService.CreateTokenAsync();
-            return Ok(new { AccessToken = accessToken, RefreshToken = refreshToken });
+            var tokenModel = await _userAuthenticationService.LoginUserAsync(user);
+
+            return Ok(new { tokenModel.AccessToken, tokenModel.RefreshToken });
         }
 
-        [HttpPost("renewaccess")]
-        public async Task<IActionResult> RefreshToken([FromBody] string refreshToken)
+        [HttpPost("refresh")]
+        public async Task<IActionResult> RefreshTokenAsync([FromBody] string refreshToken)
         {
             var newAccessToken = await _jwtService.RenewAccessTokenAsync(refreshToken);
-            return newAccessToken != null ? Ok(new { AccessToken = newAccessToken }) : BadRequest(new { Message = "Invalid refresh token." });
-        }
 
-        [HttpGet("user/{login}")]
-        public async Task<IActionResult> GetUserByLogin(string login)
-        {
-            var user = await _userAuthenticationService.GetUserByLoginAsync(login);
-            return Ok(user);
+            return Ok(new { AccessToken = newAccessToken });
         }
     }
 }
