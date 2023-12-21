@@ -1,15 +1,18 @@
-﻿using AuthMicroservice.BusinessLogic.Interfaces;
+﻿using AuthMicroservice.BusinessLogic.Dtos;
+using AuthMicroservice.BusinessLogic.Interfaces;
 using AuthMicroservice.BusinessLogic.Mappings;
 using AuthMicroservice.BusinessLogic.Models;
 using AuthMicroservice.BusinessLogic.Services;
 using AuthMicroservice.BusinessLogic.Validators;
 using AuthMicroservice.DataAccess.Data;
 using AuthMicroservice.DataAccess.Models;
+using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using SharpGrip.FluentValidation.AutoValidation.Mvc.Extensions;
 using System.Text;
 
 namespace AuthMicroservice.API.Extensions
@@ -18,9 +21,11 @@ namespace AuthMicroservice.API.Extensions
     {
         public static void RegisterDependencies(this IServiceCollection services)
         {
-            services.AddScoped<IUserRegistrationDtoValidator, UserRegistrationDtoValidator>();
-            services.AddScoped<IUserLoginDtoValidator, UserLoginDtoValidator>();
+            services.AddFluentValidationAutoValidation();
+            services.AddScoped<IValidator<UserLoginDto>, UserLoginDtoValidator>();
+            services.AddScoped<IValidator<UserRegistrationDto>, UserRegistrationDtoValidator>();
             services.AddScoped<IJWTService, JWTService>();
+            services.AddScoped<IRolesService, RolesService>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IAuthenticationService, AuthenticationService>();
             services.AddAutoMapper(typeof(UserMappingProfile));
@@ -36,17 +41,12 @@ namespace AuthMicroservice.API.Extensions
                     .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking));
             var serviceProvider = services.BuildServiceProvider();
             var authContext = serviceProvider.GetRequiredService<AuthContext>();
-            authContext.Database.EnsureCreated();
         }
 
         public static void ConfigureJWT(this IServiceCollection services, IConfiguration configuration)
         {
-            var jwtConfig = configuration.GetSection("JwtConfig");
-            var secretKey = jwtConfig["secret"];
-            var authSettings = new AuthSettings();
-            configuration.GetSection("JwtConfig").Bind(authSettings);
-            services.AddSingleton(authSettings);
-            services.Configure<AuthSettings>(jwtConfig);
+            var jwtConfig = configuration.GetSection("JwtConfig").Get<AuthSettings>();
+            services.AddSingleton(jwtConfig);
             services.AddAuthentication(opt =>
             {
                 opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -60,7 +60,7 @@ namespace AuthMicroservice.API.Extensions
                     ValidateAudience = false,
                     ValidateLifetime = true,
                     ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey))
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtConfig.Secret))
                 };
             });
         }

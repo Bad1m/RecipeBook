@@ -11,42 +11,18 @@ namespace AuthMicroservice.BusinessLogic.Services
     public class AuthenticationService : IAuthenticationService
     {
         private readonly UserManager<User> _userManager;
-        private readonly RoleManager<IdentityRole> _roleManager;
         private readonly IMapper _mapper;
-        private readonly IUserLoginDtoValidator _userLoginDtoValidator;
-        private readonly IUserRegistrationDtoValidator _userRegistrationDtoValidator;
         private readonly IJWTService _jwtService;
     
-        public AuthenticationService(UserManager<User> userManager, RoleManager<IdentityRole> roleManager, IMapper mapper, IUserLoginDtoValidator userLoginDtoValidator, IUserRegistrationDtoValidator userRegistrationDtoValidator, IJWTService jwtService)
+        public AuthenticationService(UserManager<User> userManager, IMapper mapper, IJWTService jwtService)
         {
             _userManager = userManager;
-            _roleManager = roleManager;
             _mapper = mapper;
-            _userLoginDtoValidator = userLoginDtoValidator;
-            _userRegistrationDtoValidator = userRegistrationDtoValidator;
             _jwtService = jwtService;
         }
 
-        public async Task<IdentityResult> RegisterUserAsync(UserRegistrationDto userRegistration)
+        public async Task<User> RegisterUserAsync(UserRegistrationDto userRegistration)
         {
-            return await RegisterUserWithRoleAsync(userRegistration, "user");
-        }
-
-        public async Task<IdentityResult> RegisterAdminAsync(UserRegistrationDto adminRegistration)
-        {
-            return await RegisterUserWithRoleAsync(adminRegistration, "admin");
-        }
-
-        private async Task<IdentityResult> RegisterUserWithRoleAsync(UserRegistrationDto userRegistration, string role)
-        {
-            _userRegistrationDtoValidator.ValidaterRegistrationDto(userRegistration);
-            var roleExists = await _roleManager.RoleExistsAsync(role);
-
-            if (!roleExists)
-            {
-                await _roleManager.CreateAsync(new IdentityRole(role));
-            }
-
             var existingUser = await _userManager.FindByNameAsync(userRegistration.UserName);
 
             if (existingUser != null)
@@ -63,19 +39,17 @@ namespace AuthMicroservice.BusinessLogic.Services
 
             var user = _mapper.Map<User>(userRegistration);
             var result = await _userManager.CreateAsync(user, userRegistration.Password);
-            await _userManager.AddToRoleAsync(user, role);
 
             if (!result.Succeeded)
             {
                 throw new InvalidOperationException("User registration failed.");
             }
 
-            return result;
+            return user;
         }
 
         public async Task<TokenModel> LoginUserAsync(UserLoginDto loginDto)
         {
-            _userLoginDtoValidator.ValidateUserLoginDto(loginDto);
             var user = await _userManager.FindByNameAsync(loginDto.UserName);
 
             if (user != null && await _userManager.CheckPasswordAsync(user, loginDto.Password))

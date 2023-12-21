@@ -1,12 +1,13 @@
-﻿using AuthMicroservice.BusinessLogic.Interfaces;
-using Microsoft.AspNetCore.Authorization;
+﻿using AuthMicroservice.API.Attributes;
+using AuthMicroservice.BusinessLogic.Enums;
+using AuthMicroservice.BusinessLogic.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AuthMicroservice.API.Controllers
 {
     [Route("api/users")]
     [ApiController]
-    [Authorize(Roles = "admin")]
+    [AuthorizeRoles(Roles.Admin)]
     public class UsersController : Controller
     {
         private readonly IUserService _userService;
@@ -16,18 +17,18 @@ namespace AuthMicroservice.API.Controllers
             _userService = userService;
         }
 
-        [HttpGet("users")]
-        public IActionResult GetAllUsers()
+        [HttpGet]
+        public IActionResult GetAllUsers(int page = 1, int pageSize = 10)
         {
-            var users = _userService.GetAllUsers();
+            var users = _userService.GetAllUsers(page, pageSize);
 
             return Ok(users);
         }
 
-        [HttpGet("users/{login}")]
+        [HttpGet("{login}")]
         public async Task<IActionResult> GetUserByLoginAsync(string login)
         {
-            var user = await _userService.GetUserByLoginAsync(login);
+            var user = await _userService.GetUserDtoByLoginAsync(login);
 
             return Ok(user);
         }
@@ -37,7 +38,7 @@ namespace AuthMicroservice.API.Controllers
         {
             await _userService.DeleteUserAsync(login);
 
-            return Ok();
+            return NoContent();
         }
     }
 }

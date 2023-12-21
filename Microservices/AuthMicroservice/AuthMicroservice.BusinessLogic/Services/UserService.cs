@@ -17,14 +17,30 @@ namespace AuthMicroservice.BusinessLogic.Services
             _mapper = mapper;
         }
 
-        public IEnumerable<UserDto> GetAllUsers()
+        public IEnumerable<UserDto> GetAllUsers(int page = 1, int pageSize = 10)
         {
-            var users = _userManager.Users.ToList();
+            var users = _userManager.Users
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
 
             return _mapper.Map<IEnumerable<UserDto>>(users);
         }
 
-        public async Task<UserDto?> GetUserByLoginAsync(string login)
+        public async Task<UserDto?> GetUserDtoByLoginAsync(string login)
+        {
+            var user = await GetUserAsync(login);
+
+            return _mapper.Map<UserDto>(user);
+        }
+
+        public async Task DeleteUserAsync(string login)
+        {
+            var user = await GetUserAsync(login);
+            await _userManager.DeleteAsync(user);
+        }
+
+        private async Task<User> GetUserAsync(string login)
         {
             var user = await _userManager.FindByNameAsync(login);
 
@@ -33,13 +49,7 @@ namespace AuthMicroservice.BusinessLogic.Services
                 throw new InvalidOperationException($"User with login '{login}' not found.");
             }
 
-            return _mapper.Map<UserDto>(user);
-        }
-
-        public async Task DeleteUserAsync(string login)
-        {
-            var user = await GetUserByLoginAsync(login);
-            await _userManager.DeleteAsync(_mapper.Map<User>(user));
+            return user;
         }
     }
 }

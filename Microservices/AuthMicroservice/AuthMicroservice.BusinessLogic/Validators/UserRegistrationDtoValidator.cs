@@ -1,11 +1,9 @@
 ﻿using AuthMicroservice.BusinessLogic.Dtos;
-using AuthMicroservice.BusinessLogic.Helpers;
-using AuthMicroservice.BusinessLogic.Interfaces;
 using FluentValidation;
 
 namespace AuthMicroservice.BusinessLogic.Validators
 {
-    public class UserRegistrationDtoValidator : AbstractValidator<UserRegistrationDto>, IUserRegistrationDtoValidator
+    public class UserRegistrationDtoValidator : AbstractValidator<UserRegistrationDto>
     {
         public UserRegistrationDtoValidator()
         {
@@ -24,12 +22,6 @@ namespace AuthMicroservice.BusinessLogic.Validators
             RuleFor(userDto => userDto.Email)
                 .NotEmpty().WithMessage("Email is required")
                 .EmailAddress().WithMessage("Invalid email address");
-        }
-
-        public void ValidaterRegistrationDto(UserRegistrationDto userRegistrationDto)
-        {
-            var validationResult = Validate(userRegistrationDto);
-            ValidationHelper.ValidateAndThrow(validationResult);
         }
     }
 }

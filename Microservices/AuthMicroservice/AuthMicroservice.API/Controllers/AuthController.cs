@@ -1,36 +1,34 @@
 ﻿using AuthMicroservice.BusinessLogic.Dtos;
+using AuthMicroservice.BusinessLogic.Enums;
 using AuthMicroservice.BusinessLogic.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AuthMicroservice.API.Controllers
 {
     [Route("api/auth")]
     [ApiController]
+    [AllowAnonymous]
     public class AuthController : ControllerBase
     {
         private readonly IJWTService _jwtService;
         private readonly IAuthenticationService _userAuthenticationService;
+        private readonly IRolesService _rolesService;
 
-        public AuthController(IAuthenticationService userAuthenticationService, IJWTService jwtService)
+        public AuthController(IAuthenticationService userAuthenticationService, IJWTService jwtService, IRolesService rolesService)
         {
             _userAuthenticationService = userAuthenticationService;
             _jwtService = jwtService;
+            _rolesService = rolesService;
         }
 
-        [HttpPost("register/user")]
-        public async Task<IActionResult> RegisterUserAsync([FromBody] UserRegistrationDto userRegistration)
+        [HttpPost("register")]
+        public async Task<IActionResult> RegisterAsync([FromBody] UserRegistrationDto userRegistrationDto)
         {
-            await _userAuthenticationService.RegisterUserAsync(userRegistration);
+            var user = await _userAuthenticationService.RegisterUserAsync(userRegistrationDto);
+            await _rolesService.AssignRoleToUserAsync(user.Id, Roles.User);
 
-            return Ok(userRegistration);
-        }
-
-        [HttpPost("register/admin")]
-        public async Task<IActionResult> RegisterAdminAsync([FromBody] UserRegistrationDto adminRegistration)
-        {
-            await _userAuthenticationService.RegisterAdminAsync(adminRegistration);
-
-            return Ok(adminRegistration);
+            return Ok(user);
         }
 
         [HttpPost("login")]
@@ -38,7 +36,7 @@ namespace AuthMicroservice.API.Controllers
         {
             var tokenModel = await _userAuthenticationService.LoginUserAsync(user);
 
-            return Ok(new { tokenModel.AccessToken, tokenModel.RefreshToken });
+            return Ok(tokenModel);
         }
 
         [HttpPost("refresh")]
@@ -46,7 +44,7 @@ namespace AuthMicroservice.API.Controllers
         {
             var newAccessToken = await _jwtService.RenewAccessTokenAsync(refreshToken);
 
-            return Ok(new { AccessToken = newAccessToken });
+            return Ok(newAccessToken);
         }
     }
 }

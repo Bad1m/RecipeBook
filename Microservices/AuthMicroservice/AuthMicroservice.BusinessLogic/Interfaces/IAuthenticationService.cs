@@ -1,13 +1,12 @@
 ﻿using AuthMicroservice.BusinessLogic.Dtos;
 using AuthMicroservice.BusinessLogic.Models;
-using Microsoft.AspNetCore.Identity;
+using AuthMicroservice.DataAccess.Models;
 
 namespace AuthMicroservice.BusinessLogic.Interfaces
 {
     public interface IAuthenticationService
     {
-        Task<IdentityResult> RegisterUserAsync(UserRegistrationDto userForRegistration);
-        Task<IdentityResult> RegisterAdminAsync(UserRegistrationDto adminRegistration);
+        Task<User> RegisterUserAsync(UserRegistrationDto userRegistration);
         Task<TokenModel> LoginUserAsync(UserLoginDto loginDto);
     }
 }
