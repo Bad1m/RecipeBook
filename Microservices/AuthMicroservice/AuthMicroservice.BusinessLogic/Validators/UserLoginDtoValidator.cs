@@ -1,4 +1,5 @@
-﻿using AuthMicroservice.BusinessLogic.Dtos;
+﻿using AuthMicroservice.BusinessLogic.Constants;
+using AuthMicroservice.BusinessLogic.Dtos;
 using FluentValidation;
 
 namespace AuthMicroservice.BusinessLogic.Validators
@@ -8,10 +9,10 @@ namespace AuthMicroservice.BusinessLogic.Validators
         public UserLoginDtoValidator()
         {
             RuleFor(userLoginDto => userLoginDto.UserName)
-                .NotEmpty().WithMessage("Username is required");
+                .NotEmpty().WithMessage(ErrorMessages.UsernameRequired);
 
             RuleFor(userLoginDto => userLoginDto.Password)
-                .NotEmpty().WithMessage("Password is required");
+                .NotEmpty().WithMessage(ErrorMessages.PasswordRequired);
         }
     }
 }

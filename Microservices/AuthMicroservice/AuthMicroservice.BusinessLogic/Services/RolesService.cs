@@ -1,6 +1,7 @@
-﻿using AuthMicroservice.BusinessLogic.Enums;
+﻿using AuthMicroservice.BusinessLogic.Constants;
+using AuthMicroservice.BusinessLogic.Enums;
 using AuthMicroservice.BusinessLogic.Interfaces;
-using AuthMicroservice.DataAccess.Models;
+using AuthMicroservice.DataAccess.Entities;   
 using Microsoft.AspNetCore.Identity;
 
 namespace AuthMicroservice.BusinessLogic.Services
@@ -22,10 +23,16 @@ namespace AuthMicroservice.BusinessLogic.Services
 
             if (user == null)
             {
-                throw new ArgumentException("User not found.");
+                throw new ArgumentException(ErrorMessages.UserNotFound);
             }
 
             var roleName = Enum.GetName(typeof(Roles), role);
+
+            if (!Enum.IsDefined(typeof(Roles), role))
+            {
+                throw new ArgumentException(ErrorMessages.InvalidRoleSpecified);
+            }
+
             var roleExists = await _roleManager.RoleExistsAsync(roleName);
 
             if (!roleExists)
@@ -37,7 +44,7 @@ namespace AuthMicroservice.BusinessLogic.Services
 
             if (!result.Succeeded)
             {
-                throw new InvalidOperationException($"Failed to assign role '{roleName}' to user.");
+                throw new InvalidOperationException(string.Format(ErrorMessages.AssignRoleFailed, roleName));
             }
         }
     }

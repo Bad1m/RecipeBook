@@ -1,11 +1,9 @@
-﻿using AuthMicroservice.BusinessLogic.Dtos;
-using AuthMicroservice.BusinessLogic.Interfaces;
+﻿using AuthMicroservice.BusinessLogic.Interfaces;
 using AuthMicroservice.BusinessLogic.Mappings;
 using AuthMicroservice.BusinessLogic.Models;
 using AuthMicroservice.BusinessLogic.Services;
-using AuthMicroservice.BusinessLogic.Validators;
 using AuthMicroservice.DataAccess.Data;
-using AuthMicroservice.DataAccess.Models;
+using AuthMicroservice.DataAccess.Entities;
 using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -22,8 +20,7 @@ namespace AuthMicroservice.API.Extensions
         public static void RegisterDependencies(this IServiceCollection services)
         {
             services.AddFluentValidationAutoValidation();
-            services.AddScoped<IValidator<UserLoginDto>, UserLoginDtoValidator>();
-            services.AddScoped<IValidator<UserRegistrationDto>, UserRegistrationDtoValidator>();
+            services.AddValidatorsFromAssemblies(AppDomain.CurrentDomain.GetAssemblies(), ServiceLifetime.Scoped);
             services.AddScoped<IJWTService, JWTService>();
             services.AddScoped<IRolesService, RolesService>();
             services.AddScoped<IUserService, UserService>();

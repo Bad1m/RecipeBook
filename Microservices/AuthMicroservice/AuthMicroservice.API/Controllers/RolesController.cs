@@ -15,10 +15,10 @@ namespace AuthMicroservice.API.Controllers
             _rolesService = rolesService;
         }
 
-        [HttpPost("{userId}")]
-        public async Task<IActionResult> AssignAdminRoleToUserAsync(string userId)
+        [HttpPost("assign-role/{userId}")]
+        public async Task<IActionResult> AssignRoleToUserAsync(string userId, Roles role)
         {
-            await _rolesService.AssignRoleToUserAsync(userId, Roles.Admin);
+            await _rolesService.AssignRoleToUserAsync(userId, role);
 
             return NoContent();
         }

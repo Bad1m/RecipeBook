@@ -1,4 +1,4 @@
-﻿using AuthMicroservice.DataAccess.Models;
+﻿using AuthMicroservice.DataAccess.Entities;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 

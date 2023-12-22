@@ -1,6 +1,6 @@
 ﻿using AuthMicroservice.BusinessLogic.Dtos;
 using AuthMicroservice.BusinessLogic.Models;
-using AuthMicroservice.DataAccess.Models;
+using AuthMicroservice.DataAccess.Entities;
 
 namespace AuthMicroservice.BusinessLogic.Interfaces
 {

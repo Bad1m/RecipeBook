@@ -1,6 +1,7 @@
-﻿using AuthMicroservice.BusinessLogic.Dtos;
+﻿using AuthMicroservice.BusinessLogic.Constants;
+using AuthMicroservice.BusinessLogic.Dtos;
 using AuthMicroservice.BusinessLogic.Interfaces;
-using AuthMicroservice.DataAccess.Models;
+using AuthMicroservice.DataAccess.Entities;
 using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 
@@ -17,7 +18,7 @@ namespace AuthMicroservice.BusinessLogic.Services
             _mapper = mapper;
         }
 
-        public IEnumerable<UserDto> GetAllUsers(int page = 1, int pageSize = 10)
+        public async Task<IEnumerable<UserDto>> GetAllUsersAsync(int page = 1, int pageSize = 10)
         {
             var users = _userManager.Users
                 .Skip((page - 1) * pageSize)
@@ -46,7 +47,7 @@ namespace AuthMicroservice.BusinessLogic.Services
 
             if (user == null)
             {
-                throw new InvalidOperationException($"User with login '{login}' not found.");
+                throw new InvalidOperationException(string.Format(ErrorMessages.UserNotFoundByLogin, login));
             }
 
             return user;

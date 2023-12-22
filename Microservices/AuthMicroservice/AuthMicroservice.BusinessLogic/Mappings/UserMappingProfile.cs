@@ -1,5 +1,5 @@
 ﻿using AuthMicroservice.BusinessLogic.Dtos;
-using AuthMicroservice.DataAccess.Models;
+using AuthMicroservice.DataAccess.Entities;
 using AutoMapper;
 
 namespace AuthMicroservice.BusinessLogic.Mappings
@@ -9,8 +9,8 @@ namespace AuthMicroservice.BusinessLogic.Mappings
         public UserMappingProfile()
         {
             CreateMap<UserRegistrationDto, User>();
-            CreateMap<User, UserDto>();
-            CreateMap<UserDto, User>();
+
+            CreateMap<User, UserDto>().ReverseMap();
         }
     }
 }

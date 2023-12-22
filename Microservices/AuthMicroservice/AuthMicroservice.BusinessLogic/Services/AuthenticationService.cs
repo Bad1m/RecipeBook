@@ -1,7 +1,8 @@
-﻿using AuthMicroservice.BusinessLogic.Dtos;
+﻿using AuthMicroservice.BusinessLogic.Constants;
+using AuthMicroservice.BusinessLogic.Dtos;
 using AuthMicroservice.BusinessLogic.Interfaces;
 using AuthMicroservice.BusinessLogic.Models;
-using AuthMicroservice.DataAccess.Models;
+using AuthMicroservice.DataAccess.Entities;
 using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using System.Security.Authentication;
@@ -27,14 +28,14 @@ namespace AuthMicroservice.BusinessLogic.Services
 
             if (existingUser != null)
             {
-                throw new InvalidOperationException("Username is already taken.");
+                throw new InvalidOperationException(ErrorMessages.UsernameAlreadyTaken);
             }
 
             var existingUserByEmail = await _userManager.FindByEmailAsync(userRegistration.Email);
 
             if (existingUserByEmail != null)
             {
-                throw new InvalidOperationException("Email is already taken.");
+                throw new InvalidOperationException(ErrorMessages.EmailAlreadyTaken);
             }
 
             var user = _mapper.Map<User>(userRegistration);
@@ -42,7 +43,7 @@ namespace AuthMicroservice.BusinessLogic.Services
 
             if (!result.Succeeded)
             {
-                throw new InvalidOperationException("User registration failed.");
+                throw new InvalidOperationException(ErrorMessages.UserRegistrationFailed);
             }
 
             return user;
@@ -51,14 +52,16 @@ namespace AuthMicroservice.BusinessLogic.Services
         public async Task<TokenModel> LoginUserAsync(UserLoginDto loginDto)
         {
             var user = await _userManager.FindByNameAsync(loginDto.UserName);
+            var isCorrectPassword = await _userManager.CheckPasswordAsync(user, loginDto.Password);
 
-            if (user != null && await _userManager.CheckPasswordAsync(user, loginDto.Password))
+            if (user != null && isCorrectPassword)
             {
                 var tokenModel = await _jwtService.CreateTokenAsync(_mapper.Map<UserDto>(user));
+
                 return tokenModel;
             }
 
-            throw new AuthenticationException("Invalid credentials.");
+            throw new AuthenticationException(ErrorMessages.InvalidCredentials);
         }
     }
 }

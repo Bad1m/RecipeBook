@@ -1,7 +1,8 @@
-﻿using AuthMicroservice.BusinessLogic.Dtos;
+﻿using AuthMicroservice.BusinessLogic.Constants;
+using AuthMicroservice.BusinessLogic.Dtos;
 using AuthMicroservice.BusinessLogic.Interfaces;
 using AuthMicroservice.BusinessLogic.Models;
-using AuthMicroservice.DataAccess.Models;
+using AuthMicroservice.DataAccess.Entities;
 using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -43,11 +44,11 @@ namespace AuthMicroservice.BusinessLogic.Services
 
         public async Task<string> RenewAccessTokenAsync(string refreshToken)
         {
-            var user = await _userManager.Users.FirstOrDefaultAsync(u => u.RefreshToken == refreshToken);
+            var user = await _userManager.Users.FirstOrDefaultAsync(user => user.RefreshToken == refreshToken);
 
             if (user == null)
             {
-                throw new InvalidOperationException("User not found for the given refresh token.");
+                throw new InvalidOperationException(ErrorMessages.UserNotFoundForRefreshToken);
             }
 
             var signingCredentials = GetSigningCredentials();
@@ -109,6 +110,7 @@ namespace AuthMicroservice.BusinessLogic.Services
         private string GenerateRefreshToken()
         {
             var randomNumber = new byte[32];
+
             using (var rng = RandomNumberGenerator.Create())
             {
                 rng.GetBytes(randomNumber);

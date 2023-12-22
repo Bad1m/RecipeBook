@@ -18,9 +18,9 @@ namespace AuthMicroservice.API.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetAllUsers(int page = 1, int pageSize = 10)
+        public async Task<IActionResult> GetAllUsers(int page = 1, int pageSize = 10)
         {
-            var users = _userService.GetAllUsers(page, pageSize);
+            var users = await _userService.GetAllUsersAsync(page, pageSize);
 
             return Ok(users);
         }
