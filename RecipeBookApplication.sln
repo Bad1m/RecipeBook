@@ -21,19 +21,19 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AuthMicroservice.API", "Mic
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ReviewMicroservice.API", "Microservices\ReviewMicroservice\ReviewMicroservice.API\ReviewMicroservice.API.csproj", "{E0B80FB4-1079-4F0A-B04A-EDD86FF34BCE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReviewMicroservice.Domain", "Microservices\ReviewMicroservice\ReviewMicroservice.Domain\ReviewMicroservice.Domain.csproj", "{1D2E040C-010D-421A-80C3-CEDABD6C24C9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ReviewMicroservice.Domain", "Microservices\ReviewMicroservice\ReviewMicroservice.Domain\ReviewMicroservice.Domain.csproj", "{1D2E040C-010D-421A-80C3-CEDABD6C24C9}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ReviewMicroservice.Infrastructure", "Microservices\ReviewMicroservice\ReviewMicroservice.Infrastructure\ReviewMicroservice.Infrastructure.csproj", "{2A3E2C0A-B4FE-4286-A74B-79AFE4B68F4C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReviewMicroservice.Application", "Microservices\ReviewMicroservice\ReviewMicroservice.Application\ReviewMicroservice.Application.csproj", "{453A4B36-9A3D-4DF4-BD59-BD8D0A47357C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ReviewMicroservice.Application", "Microservices\ReviewMicroservice\ReviewMicroservice.Application\ReviewMicroservice.Application.csproj", "{453A4B36-9A3D-4DF4-BD59-BD8D0A47357C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RecipeMicroservice.Domain", "Microservices\RecipeMicroservice\RecipeMicroservice.Domain\RecipeMicroservice.Domain.csproj", "{FB1B231B-96D9-4D8C-9AFF-F53D4430C4B9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RecipeMicroservice.Domain", "Microservices\RecipeMicroservice\RecipeMicroservice.Domain\RecipeMicroservice.Domain.csproj", "{FB1B231B-96D9-4D8C-9AFF-F53D4430C4B9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RecipeMicroservice.Infrastructure", "Microservices\RecipeMicroservice\RecipeMicroservice.Infrastructure\RecipeMicroservice.Infrastructure.csproj", "{F5BF138C-A499-4D91-B643-417ED1F97E22}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RecipeMicroservice.Infrastructure", "Microservices\RecipeMicroservice\RecipeMicroservice.Infrastructure\RecipeMicroservice.Infrastructure.csproj", "{F5BF138C-A499-4D91-B643-417ED1F97E22}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RecipeMicroservice.Application", "Microservices\RecipeMicroservice\RecipeMicroservice.Application\RecipeMicroservice.Application.csproj", "{6C73E89C-BBDF-4E31-815E-3EC504B852FD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RecipeMicroservice.Application", "Microservices\RecipeMicroservice\RecipeMicroservice.Application\RecipeMicroservice.Application.csproj", "{6C73E89C-BBDF-4E31-815E-3EC504B852FD}"
 EndProject
-Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{3696F2AF-90AC-47B7-9E13-79B999B171EA}"
+Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{D67829B9-9448-44FF-8F67-B842706A5A64}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -85,10 +85,10 @@ Global
 		{6C73E89C-BBDF-4E31-815E-3EC504B852FD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6C73E89C-BBDF-4E31-815E-3EC504B852FD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6C73E89C-BBDF-4E31-815E-3EC504B852FD}.Release|Any CPU.Build.0 = Release|Any CPU
-		{3696F2AF-90AC-47B7-9E13-79B999B171EA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{3696F2AF-90AC-47B7-9E13-79B999B171EA}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{3696F2AF-90AC-47B7-9E13-79B999B171EA}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{3696F2AF-90AC-47B7-9E13-79B999B171EA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D67829B9-9448-44FF-8F67-B842706A5A64}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D67829B9-9448-44FF-8F67-B842706A5A64}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D67829B9-9448-44FF-8F67-B842706A5A64}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D67829B9-9448-44FF-8F67-B842706A5A64}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
