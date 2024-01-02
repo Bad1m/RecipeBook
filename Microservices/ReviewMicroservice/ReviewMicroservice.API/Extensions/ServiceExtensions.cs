@@ -3,7 +3,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using ReviewMicroservice.Application.Interfaces;
 using ReviewMicroservice.Application.Services;
-using ReviewMicroservice.Domain.Mappings;
+using ReviewMicroservice.Application.Mappings;
 using ReviewMicroservice.Domain.Settings;
 using ReviewMicroservice.Infrastructure.Data;
 using ReviewMicroservice.Infrastructure.Interfaces;
@@ -25,15 +25,12 @@ namespace ReviewMicroservice.API.Extensions
 
         public static void ConfigureMongoDBContext(this IServiceCollection services, IConfiguration configuration)
         {
-            var isDocker = Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER") == "true";
-
             services.Configure<MongoDBSettings>(configuration.GetSection(nameof(MongoDBSettings)));
             services.AddSingleton(serviceProvider =>
             {
-                var settings = serviceProvider.GetRequiredService<IOptions<MongoDBSettings>>().Value;
-                var connectionString = isDocker ? settings.DockerConnectionString : settings.ConnectionString;
+                var settings = serviceProvider.GetRequiredService<IOptions<MongoDBSettings>>();
 
-                return new MongoDBContext(connectionString, settings.DatabaseName);
+                return new MongoDBContext(settings);
             });
         }
 

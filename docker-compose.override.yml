@@ -33,7 +33,6 @@ services:
   reviewmicroservice.api:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - DOTNET_RUNNING_IN_CONTAINER=true
     ports:
       - "8080"
     depends_on:
@@ -41,6 +40,7 @@ services:
     volumes:
       - ${HOME}/.microsoft/usersecrets/:/root/.microsoft/usersecrets
       - ${HOME}/.aspnet/https:/root/.aspnet/https/
+      - ./Microservices/ReviewMicroservice/ReviewMicroservice.API/appsettings.Docker.json:/app/appsettings.Development.json
 
   sqlserver:
     container_name: sqldb

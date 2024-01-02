@@ -1,5 +1,7 @@
-﻿using MongoDB.Driver;
+﻿using Microsoft.Extensions.Options;
+using MongoDB.Driver;
 using ReviewMicroservice.Domain.Entities;
+using ReviewMicroservice.Domain.Settings;
 
 namespace ReviewMicroservice.Infrastructure.Data
 {
@@ -7,12 +9,13 @@ namespace ReviewMicroservice.Infrastructure.Data
     {
         private readonly IMongoDatabase _database;
 
-        public MongoDBContext(string connectionString, string databaseName)
-        {
-            var client = new MongoClient(connectionString);
-            _database = client.GetDatabase(databaseName);
-        }
+        public IMongoCollection<Review> Reviews;
 
-        public IMongoCollection<Review> Reviews => _database.GetCollection<Review>("Reviews");
+        public MongoDBContext(IOptions<MongoDBSettings> mongoDbSettings)
+        {
+            var client = new MongoClient(mongoDbSettings.Value.ConnectionString);
+            _database = client.GetDatabase(mongoDbSettings.Value.DatabaseName);
+            Reviews = _database.GetCollection<Review>("Reviews");
+        }
     }
 }

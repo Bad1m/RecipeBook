@@ -14,34 +14,61 @@ namespace ReviewMicroservice.Infrastructure.Repositories
             _context = context;
         }
 
-        public async Task<List<Review>> GetAllAsync()
+        public async Task<List<Review>> GetAllAsync(int pageNumber, int pageSize, CancellationToken cancellationToken)
         {
-            return await _context.Reviews.Find(_ => true).ToListAsync();
+            int skip = (pageNumber - 1) * pageSize;
+            var pagedReviews = await _context.Reviews.Find(_ => true)
+                .Skip(skip)
+                .Limit(pageSize)
+                .ToListAsync(cancellationToken);
+
+            return pagedReviews;
         }
 
-        public async Task DeleteByIdAsync(string id)
+        public async Task DeleteByIdAsync(string id, CancellationToken cancellationToken)
         {
-            await _context.Reviews.DeleteOneAsync(review => review.Id == id);
+            await _context.Reviews.DeleteOneAsync(review => review.Id == id, cancellationToken);
         }
 
-        public async Task<Review> GetByIdAsync(string id)
+        public async Task<Review> GetByIdAsync(string id, CancellationToken cancellationToken)
         {
-            return await _context.Reviews.Find(review => review.Id == id).FirstOrDefaultAsync();
+            return await _context.Reviews.Find(review => review.Id == id).FirstOrDefaultAsync(cancellationToken);
         }
 
-        public async Task InsertAsync(Review review)
+        public async Task InsertAsync(Review review, CancellationToken cancellationToken)
         {
-            await _context.Reviews.InsertOneAsync(review);
+            await _context.Reviews.InsertOneAsync(review, cancellationToken);
         }
 
-        public async Task UpdateAsync(string id, Review updatedReview)
+        public async Task UpdateAsync(string id, Review updatedReview, CancellationToken cancellationToken)
         {
-            await _context.Reviews.ReplaceOneAsync(review => review.Id == id, updatedReview);
+            var filter = Builders<Review>.Filter.Eq(review => review.Id, id);
+
+            var updateOptions = new UpdateOptions
+            {
+                IsUpsert = false
+            };
+
+            await _context.Reviews.ReplaceOneAsync(filter, updatedReview, updateOptions, cancellationToken);
         }
 
-        public async Task<List<Review>> GetByRecipeIdAsync(string recipeId)
+        public async Task<List<Review>> GetByRecipeIdAsync(string recipeId, int pageNumber, int pageSize, CancellationToken cancellationToken)
         {
-            return await _context.Reviews.Find(r => r.RecipeId == recipeId).ToListAsync();
+            int skip = (pageNumber - 1) * pageSize;
+            var pagedReviews = await _context.Reviews.Find(r => r.RecipeId == recipeId)
+                .Skip(skip)
+                .Limit(pageSize)
+                .ToListAsync(cancellationToken);
+
+            return pagedReviews;
+        }
+
+        public async Task<bool> IsReviewExistsAsync(string id, CancellationToken cancellationToken)
+        {
+            var filter = Builders<Review>.Filter.Eq(review => review.Id, id);
+            var count = await _context.Reviews.CountDocumentsAsync(filter, new CountOptions(), cancellationToken);
+
+            return count > 0;
         }
     }
 }

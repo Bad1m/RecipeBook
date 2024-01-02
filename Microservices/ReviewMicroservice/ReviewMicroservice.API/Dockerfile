@@ -7,7 +7,6 @@ EXPOSE 8080
 EXPOSE 8081
 
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
-ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["Microservices/ReviewMicroservice/ReviewMicroservice.API/ReviewMicroservice.API.csproj", "Microservices/ReviewMicroservice/ReviewMicroservice.API/"]
 COPY ["Microservices/RecipeMicroservice/RecipeMicroservice.Infrastructure/RecipeMicroservice.Infrastructure.csproj", "Microservices/RecipeMicroservice/RecipeMicroservice.Infrastructure/"]
@@ -20,7 +19,6 @@ WORKDIR "/src/Microservices/ReviewMicroservice/ReviewMicroservice.API"
 RUN dotnet build "./ReviewMicroservice.API.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 FROM build AS publish
-ARG BUILD_CONFIGURATION=Release
 RUN dotnet publish "./ReviewMicroservice.API.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
