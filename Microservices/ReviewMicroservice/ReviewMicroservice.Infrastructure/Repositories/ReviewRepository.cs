@@ -1,5 +1,6 @@
 ﻿using MongoDB.Driver;
 using ReviewMicroservice.Domain.Entities;
+using ReviewMicroservice.Domain.Settings;
 using ReviewMicroservice.Infrastructure.Data;
 using ReviewMicroservice.Infrastructure.Interfaces;
 
@@ -14,12 +15,12 @@ namespace ReviewMicroservice.Infrastructure.Repositories
             _context = context;
         }
 
-        public async Task<List<Review>> GetAllAsync(int pageNumber, int pageSize, CancellationToken cancellationToken)
+        public async Task<List<Review>> GetAllAsync(PaginationSettings paginationSettings, CancellationToken cancellationToken)
         {
-            int skip = (pageNumber - 1) * pageSize;
+            int skip = (paginationSettings.Page - 1) * paginationSettings.PageSize;
             var pagedReviews = await _context.Reviews.Find(_ => true)
                 .Skip(skip)
-                .Limit(pageSize)
+                .Limit(paginationSettings.PageSize)
                 .ToListAsync(cancellationToken);
 
             return pagedReviews;
@@ -52,12 +53,12 @@ namespace ReviewMicroservice.Infrastructure.Repositories
             await _context.Reviews.ReplaceOneAsync(filter, updatedReview, updateOptions, cancellationToken);
         }
 
-        public async Task<List<Review>> GetByRecipeIdAsync(string recipeId, int pageNumber, int pageSize, CancellationToken cancellationToken)
+        public async Task<List<Review>> GetByRecipeIdAsync(string recipeId, PaginationSettings paginationSettings, CancellationToken cancellationToken)
         {
-            int skip = (pageNumber - 1) * pageSize;
+            int skip = (paginationSettings.Page - 1) * paginationSettings.PageSize;
             var pagedReviews = await _context.Reviews.Find(r => r.RecipeId == recipeId)
                 .Skip(skip)
-                .Limit(pageSize)
+                .Limit(paginationSettings.PageSize)
                 .ToListAsync(cancellationToken);
 
             return pagedReviews;

@@ -4,6 +4,7 @@ using ReviewMicroservice.Domain.Constants;
 using ReviewMicroservice.Application.Dtos;
 using ReviewMicroservice.Domain.Entities;
 using ReviewMicroservice.Infrastructure.Interfaces;
+using ReviewMicroservice.Domain.Settings;
 
 namespace ReviewMicroservice.Application.Services
 {
@@ -18,9 +19,9 @@ namespace ReviewMicroservice.Application.Services
             _mapper = mapper;
         }
 
-        public async Task<List<ReviewDto>> GetAllAsync(int pageNumber, int pageSize, CancellationToken cancellationToken)
+        public async Task<List<ReviewDto>> GetAllAsync(PaginationSettings paginationSettings, CancellationToken cancellationToken)
         {
-            var reviews = await _reviewRepository.GetAllAsync(pageNumber, pageSize, cancellationToken);
+            var reviews = await _reviewRepository.GetAllAsync(paginationSettings, cancellationToken);
 
             return _mapper.Map<List<ReviewDto>>(reviews);
         }
@@ -55,9 +56,9 @@ namespace ReviewMicroservice.Application.Services
             await _reviewRepository.UpdateAsync(id, review, cancellationToken);
         }
 
-        public async Task<List<ReviewDto>> GetByRecipeIdAsync(string recipeId, int pageNumber, int pageSize, CancellationToken cancellationToken)
+        public async Task<List<ReviewDto>> GetByRecipeIdAsync(string recipeId, PaginationSettings paginationSettings, CancellationToken cancellationToken)
         {
-            var reviews = await _reviewRepository.GetByRecipeIdAsync(recipeId, pageNumber, pageSize, cancellationToken);
+            var reviews = await _reviewRepository.GetByRecipeIdAsync(recipeId, paginationSettings, cancellationToken);
 
             return _mapper.Map<List<ReviewDto>>(reviews);
         }

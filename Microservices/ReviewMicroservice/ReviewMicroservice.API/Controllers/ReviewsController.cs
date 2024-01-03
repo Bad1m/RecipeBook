@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ReviewMicroservice.Application.Interfaces;
 using ReviewMicroservice.Application.Dtos;
+using ReviewMicroservice.Domain.Settings;
 
 namespace ReviewMicroservice.API.Controllers
 {
@@ -16,15 +17,15 @@ namespace ReviewMicroservice.API.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<ReviewDto>>> Get(CancellationToken cancellationToken, int page = 1, int pageSize = 10)
+        public async Task<ActionResult<IEnumerable<ReviewDto>>> GetAsync(CancellationToken cancellationToken, [FromQuery] PaginationSettings paginationSettings)
         {
-            var reviews = await _reviewService.GetAllAsync(page, pageSize, cancellationToken);
+            var reviews = await _reviewService.GetAllAsync(paginationSettings, cancellationToken);
 
             return Ok(reviews);
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<ReviewDto>> Get(string id, CancellationToken cancellationToken)
+        public async Task<ActionResult<ReviewDto>> GetAsync(string id, CancellationToken cancellationToken)
         {
             var review = await _reviewService.GetByIdAsync(id, cancellationToken);
 
@@ -32,15 +33,15 @@ namespace ReviewMicroservice.API.Controllers
         }
 
         [HttpGet("recipe/{recipeId}")]
-        public async Task<ActionResult<IEnumerable<ReviewDto>>> GetByRecipeId(string recipeId, CancellationToken cancellationToken, int page = 1, int pageSize = 10)
+        public async Task<ActionResult<IEnumerable<ReviewDto>>> GetByRecipeIdAsync(string recipeId, CancellationToken cancellationToken, [FromQuery] PaginationSettings paginationSettings)
         {
-            var reviews = await _reviewService.GetByRecipeIdAsync(recipeId, page, pageSize, cancellationToken);
+            var reviews = await _reviewService.GetByRecipeIdAsync(recipeId, paginationSettings, cancellationToken);
 
             return Ok(reviews);
         }
 
         [HttpPost]
-        public async Task<ActionResult<ReviewDto>> Create(ReviewRequest reviewRequest, CancellationToken cancellationToken)
+        public async Task<ActionResult<ReviewDto>> CreateAsync(ReviewRequest reviewRequest, CancellationToken cancellationToken)
         {
             var review = await _reviewService.InsertAsync(reviewRequest, cancellationToken);
 
@@ -48,7 +49,7 @@ namespace ReviewMicroservice.API.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(string id, ReviewRequest reviewRequest, CancellationToken cancellationToken)
+        public async Task<IActionResult> UpdateAsync(string id, ReviewRequest reviewRequest, CancellationToken cancellationToken)
         {
             await _reviewService.UpdateAsync(id, reviewRequest, cancellationToken);
 
@@ -56,7 +57,7 @@ namespace ReviewMicroservice.API.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(string id, CancellationToken cancellationToken)
+        public async Task<IActionResult> DeleteAsync(string id, CancellationToken cancellationToken)
         {
             await _reviewService.DeleteByIdAsync(id, cancellationToken);
 
