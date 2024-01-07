@@ -13,14 +13,16 @@ services:
       context: .
       dockerfile: Microservices/RecipeMicroservice/RecipeMicroservice.API/Dockerfile
 
+  sqlserver:
+    container_name: sqldb
+    image: "mcr.microsoft.com/mssql/server:2019-latest"
+    hostname: sqlserver
 
+  reviewsdb:
+    image: mongo
+ 
   reviewmicroservice.api:
     image: ${DOCKER_REGISTRY-}reviewmicroserviceapi
     build:
       context: .
       dockerfile: Microservices/ReviewMicroservice/ReviewMicroservice.API/Dockerfile
-
-  sqlserver:
-    container_name: sqldb
-    image: "mcr.microsoft.com/mssql/server:2019-latest"
-    hostname: sqlserver
