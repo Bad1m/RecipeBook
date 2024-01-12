@@ -20,16 +20,16 @@ namespace RecipeMicroservice.API.Controllers
         }
 
         [HttpGet("{recipeId}")]
-        public async Task<IActionResult> GetInstructionsByRecipeIdAsync(int recipeId, [FromQuery] PaginationSettings paginationSettings, CancellationToken cancellationToken)
+        public async Task<IActionResult> GetInstructionsByRecipeIdAsync([FromRoute] int recipeId, [FromQuery] PaginationSettings paginationSettings, CancellationToken cancellationToken)
         {
-            var query = new GetAllInstructionsByRecipeId { RecipeId = recipeId, PageNumber = paginationSettings.PageNumber, PageSize = paginationSettings.PageSize };
+            var query = new GetAllInstructionsByRecipeIdQuery { RecipeId = recipeId, PaginationSettings = paginationSettings };
             var result = await _mediator.Send(query, cancellationToken);
 
             return Ok(result);
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateInstructionAsync([FromBody] CreateInstructionForRecipe command, CancellationToken cancellationToken)
+        public async Task<IActionResult> CreateInstructionAsync([FromBody] CreateInstructionForRecipeCommand command, CancellationToken cancellationToken)
         {
             var result = await _mediator.Send(command, cancellationToken);
 
@@ -37,7 +37,7 @@ namespace RecipeMicroservice.API.Controllers
         }
 
         [HttpPut]
-        public async Task<IActionResult> UpdateInstructionAsync([FromBody] UpdateInstruction command, CancellationToken cancellationToken)
+        public async Task<IActionResult> UpdateInstructionAsync([FromBody] UpdateInstructionCommand command, CancellationToken cancellationToken)
         {
             var result = await _mediator.Send(command, cancellationToken);
 
@@ -45,9 +45,9 @@ namespace RecipeMicroservice.API.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteInstructionAsync(int id, CancellationToken cancellationToken)
+        public async Task<IActionResult> DeleteInstructionAsync([FromRoute] int id, CancellationToken cancellationToken)
         {
-            var command = new DeleteInstruction { Id = id };
+            var command = new DeleteInstructionCommand { Id = id };
             await _mediator.Send(command, cancellationToken);
 
             return NoContent();

@@ -7,7 +7,7 @@ using RecipeMicroservice.Infrastructure.Interfaces;
 
 namespace RecipeMicroservice.Application.Recipes.QueryHandlers
 {
-    public class GetAllRecipesHandler : IRequestHandler<GetAllRecipes, IEnumerable<RecipeDto>>
+    public class GetAllRecipesHandler : IRequestHandler<GetAllRecipesQuery, IEnumerable<RecipeDto>>
     {
         private readonly IRecipeRepository _recipeRepository;
 
@@ -19,14 +19,9 @@ namespace RecipeMicroservice.Application.Recipes.QueryHandlers
             _mapper = mapper;
         }
 
-        public async Task<IEnumerable<RecipeDto>> Handle(GetAllRecipes request, CancellationToken cancellationToken)
+        public async Task<IEnumerable<RecipeDto>> Handle(GetAllRecipesQuery request, CancellationToken cancellationToken)
         {
-            var page = new PaginationSettings
-            {
-                PageNumber = request.PageNumber,
-                PageSize = request.PageSize
-            };
-            var recipes = await _recipeRepository.GetAllAsync(page, cancellationToken);
+            var recipes = await _recipeRepository.GetAllAsync(request.PaginationSettings, cancellationToken);
             var recipeDtos = _mapper.Map<IEnumerable<RecipeDto>>(recipes);
 
             return recipeDtos;

@@ -17,5 +17,7 @@
         public const string IngredientNotFound = "Ingredient not found.";
         public const string UnitIsRequired = "Unit is required.";
         public const string InstructionNotFound = "Instruction not found.";
+        public const string IngredientWithSameNameExists = "Ingredient with same name exists.";
+        public const string StepNumberMustBeUnique = "StepNumber must be unique within the recipe.";
     }
 }

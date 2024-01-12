@@ -42,8 +42,6 @@ namespace RecipeMicroservice.Infrastructure.Repositories
 
             if (recipe != null)
             {
-                _context.Set<RecipeIngredient>().RemoveRange(recipe.RecipeIngredients);
-                _context.Set<Instruction>().RemoveRange(recipe.Instructions);
                 _dbSet.Remove(recipe);
             }
         }

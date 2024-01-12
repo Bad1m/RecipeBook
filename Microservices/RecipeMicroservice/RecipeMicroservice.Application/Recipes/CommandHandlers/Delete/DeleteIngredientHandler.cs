@@ -5,7 +5,7 @@ using RecipeMicroservice.Infrastructure.Interfaces;
 
 namespace RecipeMicroservice.Application.Recipes.CommandHandlers.Delete
 {
-    public class DeleteIngredientHandler : IRequestHandler<DeleteIngredient, bool>
+    public class DeleteIngredientHandler : IRequestHandler<DeleteIngredientCommand, bool>
     {
         private readonly IIngredientRepository _ingredientRepository;
 
@@ -14,7 +14,7 @@ namespace RecipeMicroservice.Application.Recipes.CommandHandlers.Delete
             _ingredientRepository = ingredientRepository;
         }
 
-        public async Task<bool> Handle(DeleteIngredient request, CancellationToken cancellationToken)
+        public async Task<bool> Handle(DeleteIngredientCommand request, CancellationToken cancellationToken)
         {
             var existingIngredient = await _ingredientRepository.GetByIdAsync(request.Id, cancellationToken);
 

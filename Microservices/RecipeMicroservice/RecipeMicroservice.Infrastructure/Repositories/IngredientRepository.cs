@@ -21,5 +21,21 @@ namespace RecipeMicroservice.Infrastructure.Repositories
                 .Take(pagination.PageSize)
                 .ToListAsync(cancellationToken);
         }
+
+        public async Task<Ingredient?> GetIngredientByRecipeIdAndNameAsync(int recipeId, string ingredientName, CancellationToken cancellationToken)
+        {
+            return await _dbSet.AsNoTracking()
+                .FirstOrDefaultAsync(ingredient =>
+                    ingredient.RecipeIngredients.Any(recipeIngredient => recipeIngredient.RecipeId == recipeId) &&
+                    ingredient.Name == ingredientName,
+                    cancellationToken);
+        }
+
+        public override async Task<Ingredient?> GetByIdAsync(int id, CancellationToken cancellationToken)
+        {
+            return await _dbSet.Include(i => i.RecipeIngredients)
+                .AsNoTracking()
+                .FirstOrDefaultAsync(i => i.Id == id, cancellationToken);
+        }
     }
 }

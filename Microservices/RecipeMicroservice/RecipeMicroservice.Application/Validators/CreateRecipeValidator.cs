@@ -4,7 +4,7 @@ using RecipeMicroservice.Domain.Constants;
 
 namespace RecipeMicroservice.Application.Validators
 {
-    public class CreateRecipeValidator : AbstractValidator<CreateRecipe>
+    public class CreateRecipeValidator : AbstractValidator<CreateRecipeCommand>
     {
         public CreateRecipeValidator()
         {

@@ -1,6 +1,9 @@
 ﻿using FluentValidation;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
+using RecipeMicroservice.API.ValidationHandler;
+using RecipeMicroservice.Application.Helpers;
 using RecipeMicroservice.Application.Mappings;
 using RecipeMicroservice.Application.Recipes.CommandHandlers.Create;
 using RecipeMicroservice.Infrastructure.Data;
@@ -14,12 +17,14 @@ namespace RecipeMicroservice.API.Extensions
     {
         public static void RegisterDependencies(this IServiceCollection services)
         {
+            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
             services.AddFluentValidationAutoValidation();
             services.AddValidatorsFromAssemblies(AppDomain.CurrentDomain.GetAssemblies(), ServiceLifetime.Scoped);
+            services.AddScoped<RecipeExistenceChecker>();
             services.AddScoped<IRecipeRepository, RecipeRepository>();
             services.AddScoped<IInstructionRepository, InstructionRepository>();
             services.AddScoped<IIngredientRepository, IngredientRepository>();
-            services.AddAutoMapper(typeof(RecipeMapperProfile));
+            services.AddAutoMapper(typeof(RecipeMappingProfile).Assembly);
             services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(CreateRecipeHandler).Assembly));
         }
 

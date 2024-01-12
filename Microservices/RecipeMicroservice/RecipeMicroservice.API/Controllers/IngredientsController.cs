@@ -20,16 +20,16 @@ namespace RecipeMicroservice.API.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetAllIngredientsByRecipeIdAsync(int id, [FromQuery] PaginationSettings paginationSettings, CancellationToken cancellationToken)
+        public async Task<IActionResult> GetAllIngredientsByRecipeIdAsync([FromRoute] int id, [FromQuery] PaginationSettings paginationSettings, CancellationToken cancellationToken)
         {
-            var query = new GetAllIngredientsByRecipeId { RecipeId = id ,PageNumber = paginationSettings.PageNumber, PageSize = paginationSettings.PageSize };
+            var query = new GetAllIngredientsByRecipeIdQuery { RecipeId = id , PaginationSettings = paginationSettings };
             var result = await _mediator.Send(query, cancellationToken);
 
             return Ok(result);
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateIngredientAsync([FromBody] CreateIngredientForRecipe command, CancellationToken cancellationToken)
+        public async Task<IActionResult> CreateIngredientAsync([FromBody] CreateIngredientForRecipeCommand command, CancellationToken cancellationToken)
         {
             var result = await _mediator.Send(command, cancellationToken);
 
@@ -37,7 +37,7 @@ namespace RecipeMicroservice.API.Controllers
         }
 
         [HttpPut]
-        public async Task<IActionResult> UpdateIngredientAsync([FromBody] UpdateIngredient command, CancellationToken cancellationToken)
+        public async Task<IActionResult> UpdateIngredientAsync([FromBody] UpdateIngredientCommand command, CancellationToken cancellationToken)
         {
             var result = await _mediator.Send(command, cancellationToken);
 
@@ -45,9 +45,9 @@ namespace RecipeMicroservice.API.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteIngredientAsync(int id, CancellationToken cancellationToken)
+        public async Task<IActionResult> DeleteIngredientAsync([FromRoute] int id, CancellationToken cancellationToken)
         {
-            var command = new DeleteIngredient { Id = id };
+            var command = new DeleteIngredientCommand { Id = id };
             await _mediator.Send(command, cancellationToken);
 
             return NoContent();

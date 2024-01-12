@@ -5,7 +5,7 @@ using RecipeMicroservice.Infrastructure.Interfaces;
 
 namespace RecipeMicroservice.Application.Recipes.CommandHandlers.Delete
 {
-    public class DeleteInstructionHandler : IRequestHandler<DeleteInstruction, bool>
+    public class DeleteInstructionHandler : IRequestHandler<DeleteInstructionCommand, bool>
     {
         private readonly IInstructionRepository _instructionRepository;
 
@@ -14,7 +14,7 @@ namespace RecipeMicroservice.Application.Recipes.CommandHandlers.Delete
             _instructionRepository = instructionRepository;
         }
 
-        public async Task<bool> Handle(DeleteInstruction request, CancellationToken cancellationToken)
+        public async Task<bool> Handle(DeleteInstructionCommand request, CancellationToken cancellationToken)
         {
             var existingInstruction = await _instructionRepository.GetByIdAsync(request.Id, cancellationToken);
 

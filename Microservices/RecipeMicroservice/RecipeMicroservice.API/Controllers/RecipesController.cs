@@ -22,23 +22,23 @@ namespace RecipeMicroservice.API.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAllRecipesAsync([FromQuery] PaginationSettings paginationSettings, CancellationToken cancellationToken)
         {
-            var query = new GetAllRecipes { PageNumber = paginationSettings.PageNumber, PageSize = paginationSettings.PageSize };
+            var query = new GetAllRecipesQuery { PaginationSettings = paginationSettings };
             var result = await _mediator.Send(query, cancellationToken);
 
             return Ok(result);
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetRecipeByIdAsync(int id, CancellationToken cancellationToken)
+        public async Task<IActionResult> GetRecipeByIdAsync([FromRoute] int id, CancellationToken cancellationToken)
         {
-            var query = new GetRecipeById { Id = id };
+            var query = new GetRecipeByIdQuery { Id = id };
             var result = await _mediator.Send(query, cancellationToken);
 
             return Ok(result);
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateRecipeAsync([FromBody] CreateRecipe command, CancellationToken cancellationToken)
+        public async Task<IActionResult> CreateRecipeAsync([FromBody] CreateRecipeCommand command, CancellationToken cancellationToken)
         {
             var result = await _mediator.Send(command, cancellationToken);
 
@@ -46,7 +46,7 @@ namespace RecipeMicroservice.API.Controllers
         }
 
         [HttpPut]
-        public async Task<IActionResult> UpdateRecipeAsync([FromBody] UpdateRecipe command, CancellationToken cancellationToken)
+        public async Task<IActionResult> UpdateRecipeAsync([FromBody] UpdateRecipeCommand command, CancellationToken cancellationToken)
         {
             var result = await _mediator.Send(command, cancellationToken);
 
@@ -54,9 +54,9 @@ namespace RecipeMicroservice.API.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteRecipeAsync(int id, CancellationToken cancellationToken)
+        public async Task<IActionResult> DeleteRecipeAsync([FromRoute] int id, CancellationToken cancellationToken)
         {
-            var command = new DeleteRecipe { Id = id };
+            var command = new DeleteRecipeCommand { Id = id };
             await _mediator.Send(command, cancellationToken);
 
             return NoContent();
