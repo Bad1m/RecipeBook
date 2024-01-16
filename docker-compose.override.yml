@@ -21,6 +21,7 @@ services:
     volumes:
       - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
       - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro
+      - ./Microservices/RecipeMicroservice/RecipeMicroservice.API/appsettings.Docker.json:/app/appsettings.Development.json
 
   reviewsdb:
     container_name: reviewsdb
