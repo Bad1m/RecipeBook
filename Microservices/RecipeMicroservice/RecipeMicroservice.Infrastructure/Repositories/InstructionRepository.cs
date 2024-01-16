@@ -22,7 +22,7 @@ namespace RecipeMicroservice.Infrastructure.Repositories
                 .ToListAsync(cancellationToken);
         }
 
-        public async Task<bool> CheckDuplicateStepNumberAsync(int recipeId, int? stepNumber, CancellationToken cancellationToken)
+        public async Task<bool> IsCheckDuplicateStepNumberAsync(int recipeId, int? stepNumber, CancellationToken cancellationToken)
         {
             return await _dbSet.AsNoTracking()
                 .AnyAsync(instruction => instruction.RecipeId == recipeId && instruction.StepNumber == stepNumber, cancellationToken);

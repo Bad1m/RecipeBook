@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using MediatR;
 using RecipeMicroservice.Application.Dtos;
-using RecipeMicroservice.Application.Helpers;
 using RecipeMicroservice.Application.Recipes.Commands.Update;
 using RecipeMicroservice.Domain.Constants;
 using RecipeMicroservice.Infrastructure.Interfaces;
@@ -29,7 +28,7 @@ namespace RecipeMicroservice.Application.Recipes.CommandHandlers.Update
             }
 
             _mapper.Map(request, existingInstruction);
-            var duplicateStepNumber = await _instructionRepository.CheckDuplicateStepNumberAsync((int)existingInstruction.RecipeId, (int)existingInstruction.StepNumber, cancellationToken);
+            var duplicateStepNumber = await _instructionRepository.IsCheckDuplicateStepNumberAsync((int)existingInstruction.RecipeId, (int)existingInstruction.StepNumber, cancellationToken);
 
             if (duplicateStepNumber)
             {

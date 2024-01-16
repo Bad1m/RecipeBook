@@ -1,9 +1,8 @@
 ﻿using AutoMapper;
 using MediatR;
 using RecipeMicroservice.Application.Dtos;
-using RecipeMicroservice.Application.Helpers;
+using RecipeMicroservice.Application.Interfaces;
 using RecipeMicroservice.Application.Recipes.Commands.Update;
-using RecipeMicroservice.Domain.Constants;
 using RecipeMicroservice.Domain.Entities;
 using RecipeMicroservice.Infrastructure.Interfaces;
 
@@ -15,19 +14,13 @@ namespace RecipeMicroservice.Application.Recipes.CommandHandlers.Update
 
         private readonly IMapper _mapper;
 
-        private readonly IIngredientRepository _ingredientRepository;
+        private readonly IRecipeExistenceChecker _recipeExistenceChecker;
 
-        private readonly RecipeExistenceChecker _recipeExistenceChecker;
-
-        private readonly IInstructionRepository _instructionRepository;
-
-        public UpdateRecipeHandler(IRecipeRepository recipeRepository, IMapper mapper, IIngredientRepository ingredientRepository, RecipeExistenceChecker recipeExistenceChecker, IInstructionRepository instructionRepository)
+        public UpdateRecipeHandler(IRecipeRepository recipeRepository, IMapper mapper, IRecipeExistenceChecker recipeExistenceChecker)
         {
             _recipeRepository = recipeRepository;
             _mapper = mapper;
-            _ingredientRepository = ingredientRepository;
             _recipeExistenceChecker = recipeExistenceChecker;
-            _instructionRepository = instructionRepository;
         }
 
        public async Task<RecipeDto> Handle(UpdateRecipeCommand request, CancellationToken cancellationToken)
@@ -35,10 +28,8 @@ namespace RecipeMicroservice.Application.Recipes.CommandHandlers.Update
             await _recipeExistenceChecker.CheckRecipeExistenceAsync(request.Id, cancellationToken);
             var recipe = _mapper.Map<Recipe>(request);
             await _recipeRepository.UpdateAsync(recipe, cancellationToken);
-            recipe = await _recipeRepository.GetByIdAsync(recipe.Id, cancellationToken);
-            var updatedRecipeDto = _mapper.Map<RecipeDto>(recipe);
 
-            return updatedRecipeDto;
+            return _mapper.Map<RecipeDto>(recipe);
         }
     }
 }

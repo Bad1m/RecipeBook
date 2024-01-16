@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using RecipeMicroservice.API.ValidationHandler;
 using RecipeMicroservice.Application.Helpers;
+using RecipeMicroservice.Application.Interfaces;
 using RecipeMicroservice.Application.Mappings;
 using RecipeMicroservice.Application.Recipes.CommandHandlers.Create;
 using RecipeMicroservice.Infrastructure.Data;
@@ -20,7 +21,7 @@ namespace RecipeMicroservice.API.Extensions
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
             services.AddFluentValidationAutoValidation();
             services.AddValidatorsFromAssemblies(AppDomain.CurrentDomain.GetAssemblies(), ServiceLifetime.Scoped);
-            services.AddScoped<RecipeExistenceChecker>();
+            services.AddScoped<IRecipeExistenceChecker, RecipeExistenceChecker>();
             services.AddScoped<IRecipeRepository, RecipeRepository>();
             services.AddScoped<IInstructionRepository, InstructionRepository>();
             services.AddScoped<IIngredientRepository, IngredientRepository>();

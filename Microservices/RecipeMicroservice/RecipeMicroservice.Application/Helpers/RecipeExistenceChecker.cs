@@ -1,10 +1,11 @@
-﻿using RecipeMicroservice.Domain.Constants;
+﻿using RecipeMicroservice.Application.Interfaces;
+using RecipeMicroservice.Domain.Constants;
 using RecipeMicroservice.Domain.Entities;
 using RecipeMicroservice.Infrastructure.Interfaces;
 
 namespace RecipeMicroservice.Application.Helpers
 {
-    public class RecipeExistenceChecker
+    public class RecipeExistenceChecker : IRecipeExistenceChecker
     {
         private readonly IRecipeRepository _recipeRepository;
 

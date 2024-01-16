@@ -31,16 +31,6 @@ namespace RecipeMicroservice.Application.Recipes.CommandHandlers.Update
 
             _mapper.Map(request, existingIngredient);
 
-            foreach (var ingredientRequest in existingIngredient.RecipeIngredients)
-            {
-                var ingredient = await _ingredientRepository.GetIngredientByRecipeIdAndNameAsync((int)ingredientRequest.RecipeId, request.Name, cancellationToken);
-
-                if (ingredient != null)
-                {
-                    throw new InvalidOperationException(ErrorMessages.IngredientWithSameNameExists);
-                }
-            }
-
             await _ingredientRepository.UpdateAsync(existingIngredient, cancellationToken);
             var updatedIngredientDto = _mapper.Map<IngredientDto>(existingIngredient);
 

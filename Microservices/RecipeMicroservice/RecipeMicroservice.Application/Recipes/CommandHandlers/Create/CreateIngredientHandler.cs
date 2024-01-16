@@ -2,6 +2,7 @@
 using MediatR;
 using RecipeMicroservice.Application.Dtos;
 using RecipeMicroservice.Application.Helpers;
+using RecipeMicroservice.Application.Interfaces;
 using RecipeMicroservice.Application.Recipes.Commands.Create;
 using RecipeMicroservice.Domain.Constants;
 using RecipeMicroservice.Domain.Entities;
@@ -17,9 +18,9 @@ namespace RecipeMicroservice.Application.Recipes.CommandHandlers.Create
 
         private readonly IRecipeRepository _recipeRepository;
 
-        private readonly RecipeExistenceChecker _recipeExistenceChecker;
+        private readonly IRecipeExistenceChecker _recipeExistenceChecker;
 
-        public CreateIngredientHandler(IIngredientRepository ingredientRepository, IMapper mapper, IRecipeRepository recipeRepository, RecipeExistenceChecker recipeExistenceChecker)
+        public CreateIngredientHandler(IIngredientRepository ingredientRepository, IMapper mapper, IRecipeRepository recipeRepository, IRecipeExistenceChecker recipeExistenceChecker)
         {
             _ingredientRepository = ingredientRepository;
             _mapper = mapper;

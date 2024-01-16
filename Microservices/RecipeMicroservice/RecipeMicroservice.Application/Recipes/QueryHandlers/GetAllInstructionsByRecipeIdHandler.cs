@@ -1,11 +1,9 @@
 ﻿using AutoMapper;
 using MediatR;
 using RecipeMicroservice.Application.Dtos;
-using RecipeMicroservice.Application.Helpers;
+using RecipeMicroservice.Application.Interfaces;
 using RecipeMicroservice.Application.Recipes.Queries;
-using RecipeMicroservice.Domain.Constants;
 using RecipeMicroservice.Infrastructure.Interfaces;
-using RecipeMicroservice.Infrastructure.Repositories;
 
 namespace RecipeMicroservice.Application.Recipes.QueryHandlers
 {
@@ -15,9 +13,9 @@ namespace RecipeMicroservice.Application.Recipes.QueryHandlers
 
         private readonly IMapper _mapper;
 
-        private readonly RecipeExistenceChecker _recipeExistenceChecker;
+        private readonly IRecipeExistenceChecker _recipeExistenceChecker;
 
-        public GetAllInstructionsByRecipeIdHandler(IInstructionRepository instructionRepository, IMapper mapper, RecipeExistenceChecker recipeExistenceChecker)
+        public GetAllInstructionsByRecipeIdHandler(IInstructionRepository instructionRepository, IMapper mapper, IRecipeExistenceChecker recipeExistenceChecker)
         {
             _instructionRepository = instructionRepository;
             _mapper = mapper;
