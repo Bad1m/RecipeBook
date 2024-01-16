@@ -22,7 +22,7 @@ namespace AuthMicroservice.BusinessLogic.Services
             _jwtService = jwtService;
         }
 
-        public async Task<User> RegisterUserAsync(UserRegistrationDto userRegistration)
+        public async Task<UserDto> RegisterUserAsync(UserRegistrationDto userRegistration)
         {
             var existingUser = await _userManager.FindByNameAsync(userRegistration.UserName);
 
@@ -46,7 +46,7 @@ namespace AuthMicroservice.BusinessLogic.Services
                 throw new InvalidOperationException(ErrorMessages.UserRegistrationFailed);
             }
 
-            return user;
+            return _mapper.Map<UserDto>(user);
         }
 
         public async Task<TokenModel> LoginUserAsync(UserLoginDto loginDto)

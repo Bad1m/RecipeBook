@@ -22,6 +22,7 @@ namespace RecipeMicroservice.Infrastructure.Repositories
         public virtual async Task<IEnumerable<TEntity>> GetAllAsync(PaginationSettings pagination, CancellationToken cancellationToken)
         {
             return await _dbSet.AsNoTracking()
+                .OrderBy(entity => entity.Id)
                 .Skip((pagination.PageNumber - 1) * pagination.PageSize)
                 .Take(pagination.PageSize)
                 .ToListAsync(cancellationToken);

@@ -1,12 +1,23 @@
 version: '3.4'
 
 services:
+  sqlserver:
+    container_name: sqlserver
+    image: "mcr.microsoft.com/mssql/server:2019-latest"
+    hostname: sqlserver
+    ports:
+      - "1433:1433"
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=!234P@ssword
+
   authmicroservice.api:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - DOTNET_RUNNING_IN_CONTAINER=true 
+      - ASPNETCORE_URLS=http://+:80
     ports:
-      - "8080"
+      - "8081:80"
     volumes:
       - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
       - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro
@@ -16,8 +27,9 @@ services:
   recipemicroservice.api:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:80
     ports:
-     - "8080"
+      - "8082:80"
     volumes:
       - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
       - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro
@@ -29,13 +41,14 @@ services:
     volumes:
       - ${WEBAPP_STORAGE_HOME}/site:/data/db
     ports:
-      - "27017:27017"
+      - "27017:3000"
 
   reviewmicroservice.api:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:80
     ports:
-      - "8080"
+      - "8083:80"
     depends_on:
       - reviewsdb
     volumes:
@@ -43,12 +56,22 @@ services:
       - ${HOME}/.aspnet/https:/root/.aspnet/https/
       - ./Microservices/ReviewMicroservice/ReviewMicroservice.API/appsettings.Docker.json:/app/appsettings.Development.json
 
-  sqlserver:
-    container_name: sqldb
-    image: "mcr.microsoft.com/mssql/server:2019-latest"
-    hostname: sqlserver
-    ports:
-      - "1433:1433"
+  gateway.recipebookapi:
     environment:
-      - ACCEPT_EULA=Y
-      - SA_PASSWORD=!234P@ssword
+      - ASPNETCORE_ENVIRONMENT=Compose
+      - ASPNETCORE_URLS=http://+:80
+    ports:
+      - "8084:80"
+    volumes:
+      - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
+      - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro
+    depends_on:
+      - reviewsdb
+      - sqlserver
+      - authmicroservice.api
+      - recipemicroservice.api
+      - reviewmicroservice.api
+    links:
+      - authmicroservice.api
+      - recipemicroservice.api
+      - reviewmicroservice.api

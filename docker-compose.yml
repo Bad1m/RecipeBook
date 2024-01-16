@@ -1,8 +1,13 @@
 version: '3.4'
 
 services:
+  sqlserver:
+    container_name: sqlserver
+    image: "mcr.microsoft.com/mssql/server:2019-latest"
+    hostname: sqlserver
+
   authmicroservice.api:
-    image: ${DOCKER_REGISTRY-}authmicroserviceapi
+    image: ${DOCKER_REGISTRY-}authmicroserviceapi   
     build:
       context: .
       dockerfile: Microservices/AuthMicroservice/AuthMicroservice.API/Dockerfile
@@ -13,16 +18,17 @@ services:
       context: .
       dockerfile: Microservices/RecipeMicroservice/RecipeMicroservice.API/Dockerfile
 
-  sqlserver:
-    container_name: sqldb
-    image: "mcr.microsoft.com/mssql/server:2019-latest"
-    hostname: sqlserver
-
   reviewsdb:
     image: mongo
- 
+
   reviewmicroservice.api:
     image: ${DOCKER_REGISTRY-}reviewmicroserviceapi
     build:
       context: .
       dockerfile: Microservices/ReviewMicroservice/ReviewMicroservice.API/Dockerfile
+
+  gateway.recipebookapi:
+    image: ${DOCKER_REGISTRY-}gatewayrecipebookapi
+    build:
+      context: .
+      dockerfile: Gateway.RecipeBookAPI/Dockerfile
