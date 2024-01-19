@@ -37,7 +37,8 @@ namespace RecipeMicroservice.API.Extensions
                     sqlServerOptions.MigrationsAssembly("RecipeMicroservice.Infrastructure"))
                     .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking));
             var serviceProvider = services.BuildServiceProvider();
-            var authContext = serviceProvider.GetRequiredService<RecipeContext>();
+            var recipeContext = serviceProvider.GetRequiredService<RecipeContext>();
+            recipeContext.Database.Migrate();
         }
 
         public static void ConfigureSwagger(this IServiceCollection services)
@@ -51,6 +52,30 @@ namespace RecipeMicroservice.API.Extensions
                     Description = "Recipe API Services."
                 });
                 swaggerGenOptions.ResolveConflictingActions(apiDescriptions => apiDescriptions.First());
+                swaggerGenOptions.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                {
+                    Name = "Authorization",
+                    Type = SecuritySchemeType.ApiKey,
+                    Scheme = "Bearer",
+                    BearerFormat = "JWT",
+                    In = ParameterLocation.Header,
+                    Description = "JWT Authorization header using the Bearer scheme."
+                });
+
+                swaggerGenOptions.AddSecurityRequirement(new OpenApiSecurityRequirement
+            {
+                {
+                    new OpenApiSecurityScheme
+                    {
+                        Reference = new OpenApiReference
+                        {
+                            Type = ReferenceType.SecurityScheme,
+                            Id = "Bearer"
+                        }
+                    },
+                    new string[] {}
+                }
+            });
             });
         }
     }

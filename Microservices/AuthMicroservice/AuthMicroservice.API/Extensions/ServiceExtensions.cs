@@ -38,6 +38,7 @@ namespace AuthMicroservice.API.Extensions
                     .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking));
             var serviceProvider = services.BuildServiceProvider();
             var authContext = serviceProvider.GetRequiredService<AuthContext>();
+            authContext.Database.Migrate();
         }
 
         public static void ConfigureJWT(this IServiceCollection services, IConfiguration configuration)
