@@ -10,7 +10,8 @@ namespace ReviewMicroservice.Infrastructure.Interfaces
         Task<Review> GetByIdAsync(string id, CancellationToken cancellationToken);
         Task InsertAsync(Review review, CancellationToken cancellationToken);
         Task UpdateAsync(string id, Review updatedReview, CancellationToken cancellationToken);
-        Task<List<Review>> GetByRecipeIdAsync(string recipeId, PaginationSettings paginationSettings, CancellationToken cancellationToken);
+        Task<List<Review>> GetByRecipeIdAsync(int recipeId, PaginationSettings paginationSettings, CancellationToken cancellationToken);
+        Task DeleteReviewsByRecipeIdAsync(int recipeId, CancellationToken cancellationToken);
         Task<bool> IsReviewExistsAsync(string id, CancellationToken cancellationToken);
     }
 }

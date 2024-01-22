@@ -7,7 +7,7 @@ namespace AuthMicroservice.API.Controllers
 {
     [Route("api/users")]
     [ApiController]
-    [AuthorizeRoles(Roles.Admin)]
+    [AuthorizeRoles(Roles.admin)]
     public class UsersController : Controller
     {
         private readonly IUserService _userService;

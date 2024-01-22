@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using MediatR;
 using RecipeMicroservice.Application.Dtos;
-using RecipeMicroservice.Application.Helpers;
 using RecipeMicroservice.Application.Interfaces;
 using RecipeMicroservice.Application.Recipes.Commands.Create;
 using RecipeMicroservice.Domain.Constants;
@@ -20,7 +19,10 @@ namespace RecipeMicroservice.Application.Recipes.CommandHandlers.Create
 
         private readonly IRecipeExistenceChecker _recipeExistenceChecker;
 
-        public CreateIngredientHandler(IIngredientRepository ingredientRepository, IMapper mapper, IRecipeRepository recipeRepository, IRecipeExistenceChecker recipeExistenceChecker)
+        public CreateIngredientHandler(IIngredientRepository ingredientRepository, 
+            IMapper mapper, 
+            IRecipeRepository recipeRepository, 
+            IRecipeExistenceChecker recipeExistenceChecker)
         {
             _ingredientRepository = ingredientRepository;
             _mapper = mapper;

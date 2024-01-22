@@ -33,7 +33,7 @@ namespace ReviewMicroservice.API.Controllers
         }
 
         [HttpGet("recipe/{recipeId}")]
-        public async Task<ActionResult<IEnumerable<ReviewDto>>> GetByRecipeIdAsync(string recipeId, CancellationToken cancellationToken, [FromQuery] PaginationSettings paginationSettings)
+        public async Task<ActionResult<IEnumerable<ReviewDto>>> GetByRecipeIdAsync(int recipeId, CancellationToken cancellationToken, [FromQuery] PaginationSettings paginationSettings)
         {
             var reviews = await _reviewService.GetByRecipeIdAsync(recipeId, paginationSettings, cancellationToken);
 

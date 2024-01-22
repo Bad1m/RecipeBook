@@ -56,6 +56,17 @@ services:
       - ${HOME}/.aspnet/https:/root/.aspnet/https/
       - ./Microservices/ReviewMicroservice/ReviewMicroservice.API/appsettings.Docker.json:/app/appsettings.Development.json
 
+  rabbitmq:
+    ports:
+        - 5672:5672
+        - 15672:15672
+    environment:
+      RABBITMQ_DEFAULT_USER: quest
+      RABBITMQ_DEFAULT_PASS: quest
+    volumes:
+        - ~/.docker-conf/rabbitmq/data/:/var/lib/rabbitmq/
+        - ~/.docker-conf/rabbitmq/log/:/var/log/rabbitmq
+
   gateway.recipebookapi:
     environment:
       - ASPNETCORE_ENVIRONMENT=Compose

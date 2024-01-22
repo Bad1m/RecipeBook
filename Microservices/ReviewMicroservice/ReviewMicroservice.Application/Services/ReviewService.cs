@@ -56,7 +56,7 @@ namespace ReviewMicroservice.Application.Services
             await _reviewRepository.UpdateAsync(id, review, cancellationToken);
         }
 
-        public async Task<List<ReviewDto>> GetByRecipeIdAsync(string recipeId, PaginationSettings paginationSettings, CancellationToken cancellationToken)
+        public async Task<List<ReviewDto>> GetByRecipeIdAsync(int recipeId, PaginationSettings paginationSettings, CancellationToken cancellationToken)
         {
             var reviews = await _reviewRepository.GetByRecipeIdAsync(recipeId, paginationSettings, cancellationToken);
 

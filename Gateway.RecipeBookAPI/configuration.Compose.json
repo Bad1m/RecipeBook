@@ -237,6 +237,17 @@
   ],
   "SwaggerEndPoints": [
     {
+      "Key": "reviews",
+      "TransformByOcelotConfig": false,
+      "Config": [
+        {
+          "Name": "Reviews API",
+          "Version": "v1",
+          "Url": "http://reviewmicroservice.api:80/swagger/v1/swagger.json"
+        }
+      ]
+    },
+    {
       "Key": "auth",
       "TransformByOcelotConfig": false,
       "Config": [
@@ -255,17 +266,6 @@
           "Name": "Recipes API",
           "Version": "v1",
           "Url": "http://recipemicroservice.api:80/swagger/v1/swagger.json"
-        }
-      ]
-    },
-    {
-      "Key": "reviews",
-      "TransformByOcelotConfig": false,
-      "Config": [
-        {
-          "Name": "Reviews API",
-          "Version": "v1",
-          "Url": "http://reviewmicroservice.api:80/swagger/v1/swagger.json"
         }
       ]
     }

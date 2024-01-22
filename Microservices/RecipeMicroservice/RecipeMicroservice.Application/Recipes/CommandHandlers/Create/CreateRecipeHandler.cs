@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
+using MassTransit;
 using MediatR;
 using RecipeMicroservice.Application.Dtos;
 using RecipeMicroservice.Application.Recipes.Commands.Create;
-using RecipeMicroservice.Domain.Constants;
 using RecipeMicroservice.Domain.Entities;
 using RecipeMicroservice.Infrastructure.Interfaces;
 
