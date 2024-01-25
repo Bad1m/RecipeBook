@@ -3,5 +3,6 @@
     public interface IRabbitMqConsumer
     {
         void StartConsuming();
+        void Dispose();
     }
 }
