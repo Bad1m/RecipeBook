@@ -22,6 +22,7 @@ namespace ReviewMicroservice.API.Extensions
             services.AddValidatorsFromAssemblies(AppDomain.CurrentDomain.GetAssemblies(), ServiceLifetime.Scoped);
             services.AddScoped<IReviewRepository, ReviewRepository>();
             services.AddScoped<IReviewService, ReviewService>();
+            services.AddScoped<ICacheRepository, CacheRepository>();
             services.AddAutoMapper(typeof(ReviewMappingProfile));
             services.AddScoped<IRabbitMqConsumer>(provider =>
             {
@@ -34,6 +35,14 @@ namespace ReviewMicroservice.API.Extensions
                     RabbitMqConfig.Key,
                     reviewRepository
                 );
+            });
+        }
+
+        public static void AddRedis(this IServiceCollection services, IConfiguration configuration)
+        {
+            services.AddStackExchangeRedisCache(options =>
+            {
+                options.Configuration = configuration["Redis:Uri"];
             });
         }
 

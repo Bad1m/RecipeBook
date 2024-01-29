@@ -3,7 +3,6 @@ using MediatR;
 using RecipeMicroservice.Application.Dtos;
 using RecipeMicroservice.Application.Recipes.Commands.Update;
 using RecipeMicroservice.Domain.Constants;
-using RecipeMicroservice.Domain.Entities;
 using RecipeMicroservice.Infrastructure.Interfaces;
 
 namespace RecipeMicroservice.Application.Recipes.CommandHandlers.Update

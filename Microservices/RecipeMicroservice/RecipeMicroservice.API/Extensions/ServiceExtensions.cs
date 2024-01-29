@@ -27,6 +27,7 @@ namespace RecipeMicroservice.API.Extensions
             services.AddScoped<IRecipeRepository, RecipeRepository>();
             services.AddScoped<IInstructionRepository, InstructionRepository>();
             services.AddScoped<IIngredientRepository, IngredientRepository>();
+            services.AddScoped<ICacheRepository, CacheRepository>();
             services.AddAutoMapper(typeof(RecipeMappingProfile).Assembly);
             services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(CreateRecipeHandler).Assembly));
             services.AddScoped<IRabbitMqProducer>(provider =>
@@ -34,6 +35,14 @@ namespace RecipeMicroservice.API.Extensions
                 var configuration = provider.GetRequiredService<IConfiguration>();
 
                 return new RabbitMqProducer(RabbitMqConfig.HostName, RabbitMqConfig.ExchangeName, RabbitMqConfig.Key);
+            });
+        }
+
+        public static void AddRedis(this IServiceCollection services, IConfiguration configuration)
+        {
+            services.AddStackExchangeRedisCache(options =>
+            {
+                options.Configuration = configuration["Redis:Uri"];
             });
         }
 

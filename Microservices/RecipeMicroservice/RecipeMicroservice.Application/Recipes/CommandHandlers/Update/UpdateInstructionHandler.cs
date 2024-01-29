@@ -10,6 +10,7 @@ namespace RecipeMicroservice.Application.Recipes.CommandHandlers.Update
     public class UpdateInstructionHandler : IRequestHandler<UpdateInstructionCommand, InstructionDto>
     {
         private readonly IInstructionRepository _instructionRepository;
+
         private readonly IMapper _mapper;
 
         public UpdateInstructionHandler(IInstructionRepository instructionRepository, IMapper mapper)

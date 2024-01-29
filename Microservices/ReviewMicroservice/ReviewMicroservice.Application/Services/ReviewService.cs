@@ -11,17 +11,27 @@ namespace ReviewMicroservice.Application.Services
     public class ReviewService : IReviewService
     {
         private readonly IReviewRepository _reviewRepository;
+
         private readonly IMapper _mapper;
 
-        public ReviewService(IReviewRepository reviewRepository, IMapper mapper)
+        private readonly ICacheRepository _cacheRepository;
+
+        public ReviewService(IReviewRepository reviewRepository, IMapper mapper, ICacheRepository cacheRepository)
         {
             _reviewRepository = reviewRepository;
             _mapper = mapper;
+            _cacheRepository = cacheRepository;
         }
 
         public async Task<List<ReviewDto>> GetAllAsync(PaginationSettings paginationSettings, CancellationToken cancellationToken)
         {
-            var reviews = await _reviewRepository.GetAllAsync(paginationSettings, cancellationToken);
+            var reviews = await _cacheRepository.GetDataAsync<List<Review>>(CacheKeys.Reviews);
+
+            if (reviews == null)
+            {
+                reviews = await _reviewRepository.GetAllAsync(paginationSettings, cancellationToken);
+                await _cacheRepository.SetDataAsync(CacheKeys.Reviews, reviews);
+            }
 
             return _mapper.Map<List<ReviewDto>>(reviews);
         }
@@ -30,13 +40,21 @@ namespace ReviewMicroservice.Application.Services
         {
             await CheckExistingReviewAsync(id, cancellationToken);
             await _reviewRepository.DeleteByIdAsync(id, cancellationToken);
+            await _cacheRepository.RemoveAsync(CacheKeys.Reviews);
         }
 
         public async Task<ReviewDto> GetByIdAsync(string id, CancellationToken cancellationToken)
         {
             await CheckExistingReviewAsync(id, cancellationToken);
-            var review = await _reviewRepository.GetByIdAsync(id, cancellationToken); ;
+            var reviews = await _cacheRepository.GetDataAsync<List<Review>>(CacheKeys.Reviews);
 
+            if (reviews == null)
+            {
+                reviews = await _reviewRepository.GetAllAsync(new PaginationSettings(), cancellationToken);
+                await _cacheRepository.SetDataAsync(CacheKeys.Reviews, reviews);
+            }
+
+            var review = reviews.FirstOrDefault(r => r.Id == id);
             return _mapper.Map<ReviewDto>(review);
         }
 
@@ -44,6 +62,7 @@ namespace ReviewMicroservice.Application.Services
         {
             var review = _mapper.Map<Review>(reviewRequest);
             await _reviewRepository.InsertAsync(review, cancellationToken);
+            await _cacheRepository.RemoveAsync(CacheKeys.Reviews);
 
             return _mapper.Map<ReviewDto>(review);
         }
@@ -54,6 +73,7 @@ namespace ReviewMicroservice.Application.Services
             var review = await _reviewRepository.GetByIdAsync(id, cancellationToken);
             _mapper.Map(reviewRequest, review);
             await _reviewRepository.UpdateAsync(id, review, cancellationToken);
+            await _cacheRepository.RemoveAsync(CacheKeys.Reviews);
         }
 
         public async Task<List<ReviewDto>> GetByRecipeIdAsync(int recipeId, PaginationSettings paginationSettings, CancellationToken cancellationToken)
