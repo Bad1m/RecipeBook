@@ -40,6 +40,7 @@ namespace ReviewMicroservice.API.Extensions
 
         public static void AddRedis(this IServiceCollection services, IConfiguration configuration)
         {
+            services.Configure<CacheOptions>(configuration.GetSection("CacheOptions"));
             services.AddStackExchangeRedisCache(options =>
             {
                 options.Configuration = configuration["Redis:Uri"];
