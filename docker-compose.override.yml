@@ -67,6 +67,12 @@ services:
         - ~/.docker-conf/rabbitmq/data/:/var/lib/rabbitmq/
         - ~/.docker-conf/rabbitmq/log/:/var/log/rabbitmq
 
+  cacheserver:
+    ports:
+     - 6379:6379
+    environment:
+     - ALLOW_EMPTY_PASSWORD=yes
+
   gateway.recipebookapi:
     environment:
       - ASPNETCORE_ENVIRONMENT=Compose

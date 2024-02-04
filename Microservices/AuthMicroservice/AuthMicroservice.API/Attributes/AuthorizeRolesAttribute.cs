@@ -8,7 +8,7 @@ namespace AuthMicroservice.API.Attributes
     {
         public AuthorizeRolesAttribute(params Roles[] roles)
         {
-            Roles = string.Join(",", roles.Select(role => role.ToString().ToLower()));
+            Roles = string.Join(",", roles.Select(role => role.ToString()));
         }
     }
 }

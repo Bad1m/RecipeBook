@@ -26,7 +26,7 @@ namespace AuthMicroservice.API.Controllers
         public async Task<IActionResult> RegisterAsync([FromBody] UserRegistrationDto userRegistrationDto)
         {
             var user = await _userAuthenticationService.RegisterUserAsync(userRegistrationDto);
-            await _rolesService.AssignRoleToUserAsync(user.Id, Roles.user);
+            await _rolesService.AssignRoleToUserAsync(user.Id, Roles.User);
 
             return Ok(user);
         }
