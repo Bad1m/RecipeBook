@@ -1,26 +1,19 @@
 ﻿using AutoMapper;
 using MediatR;
 using RecipeMicroservice.Application.Dtos;
-using RecipeMicroservice.Application.Helpers;
 using RecipeMicroservice.Application.Interfaces;
 using RecipeMicroservice.Application.Recipes.Queries;
-using RecipeMicroservice.Domain.Constants;
-using RecipeMicroservice.Domain.Entities;
-using RecipeMicroservice.Infrastructure.Interfaces;
 
 namespace RecipeMicroservice.Application.Recipes.QueryHandlers
 {
     public class GetRecipeByIdHandler : IRequestHandler<GetRecipeByIdQuery, RecipeDto>
     {
-        private readonly IRecipeRepository _recipeRepository;
-
         private IMapper _mapper;
 
         private readonly IRecipeExistenceChecker _recipeExistenceChecker;
 
-        public GetRecipeByIdHandler(IRecipeRepository recipeRepository, IMapper mapper, IRecipeExistenceChecker recipeExistenceChecker)
+        public GetRecipeByIdHandler(IMapper mapper, IRecipeExistenceChecker recipeExistenceChecker)
         {
-            _recipeRepository = recipeRepository;
             _mapper = mapper;
             _recipeExistenceChecker = recipeExistenceChecker;
         }

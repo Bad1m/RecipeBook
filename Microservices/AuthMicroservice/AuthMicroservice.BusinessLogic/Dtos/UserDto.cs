@@ -1,9 +1,9 @@
-﻿using Microsoft.AspNetCore.Identity;
-
-namespace AuthMicroservice.BusinessLogic.Dtos
+﻿namespace AuthMicroservice.BusinessLogic.Dtos
 {
-    public class UserDto : IdentityUser
+    public class UserDto
     {
+        public string? Id { get; set; }
+        public string? UserName { get; set; }
         public string? FirstName { get; set; }
         public string? LastName { get; set; }
         public string? RefreshToken { get; set; }

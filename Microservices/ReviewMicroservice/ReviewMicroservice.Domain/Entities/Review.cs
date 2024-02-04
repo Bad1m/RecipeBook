@@ -9,7 +9,7 @@ namespace ReviewMicroservice.Domain.Entities
         [BsonRepresentation(BsonType.ObjectId)]
         public string Id { get; set; }
         [BsonElement("RecipeId")]
-        public string RecipeId { get; set; }
+        public int RecipeId { get; set; }
         [BsonElement("Comment")]
         public string Comment { get; set; }
         [BsonElement("Rating")]

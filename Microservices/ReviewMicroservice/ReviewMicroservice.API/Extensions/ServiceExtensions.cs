@@ -9,6 +9,8 @@ using ReviewMicroservice.Infrastructure.Data;
 using ReviewMicroservice.Infrastructure.Interfaces;
 using ReviewMicroservice.Infrastructure.Repositories;
 using SharpGrip.FluentValidation.AutoValidation.Mvc.Extensions;
+using ReviewMicroservice.Application.Consumers;
+using ReviewMicroservice.Domain.Constants;
 
 namespace ReviewMicroservice.API.Extensions
 {
@@ -20,7 +22,29 @@ namespace ReviewMicroservice.API.Extensions
             services.AddValidatorsFromAssemblies(AppDomain.CurrentDomain.GetAssemblies(), ServiceLifetime.Scoped);
             services.AddScoped<IReviewRepository, ReviewRepository>();
             services.AddScoped<IReviewService, ReviewService>();
+            services.AddScoped<ICacheRepository, CacheRepository>();
             services.AddAutoMapper(typeof(ReviewMappingProfile));
+            services.AddScoped<IRabbitMqConsumer>(provider =>
+            {
+                var reviewRepository = provider.GetRequiredService<IReviewRepository>();
+
+                return new RabbitMqConsumer(
+                    RabbitMqConfig.HostName,
+                    RabbitMqConfig.ExchangeName,
+                    RabbitMqConfig.DeleteQueue,
+                    RabbitMqConfig.Key,
+                    reviewRepository
+                );
+            });
+        }
+
+        public static void AddRedis(this IServiceCollection services, IConfiguration configuration)
+        {
+            services.Configure<CacheOptions>(configuration.GetSection("CacheOptions"));
+            services.AddStackExchangeRedisCache(options =>
+            {
+                options.Configuration = configuration["Redis:Uri"];
+            });
         }
 
         public static void ConfigureMongoDBContext(this IServiceCollection services, IConfiguration configuration)
@@ -32,6 +56,15 @@ namespace ReviewMicroservice.API.Extensions
 
                 return new MongoDBContext(settings);
             });
+        }
+
+        public static void ConfigureRabbitMqConsumer(this IApplicationBuilder app)
+        {
+            using (var scope = app.ApplicationServices.CreateScope())
+            {
+                var rabbitMqConsumer = scope.ServiceProvider.GetRequiredService<IRabbitMqConsumer>();
+                rabbitMqConsumer.StartConsuming();
+            }
         }
 
         public static void ConfigureSwagger(this IServiceCollection services)

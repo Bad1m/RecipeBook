@@ -19,7 +19,10 @@ namespace RecipeMicroservice.Application.Recipes.CommandHandlers.Create
 
         private readonly IRecipeExistenceChecker _recipeExistenceChecker;
 
-        public CreateInstructionHandler(IInstructionRepository instructionRepository, IMapper mapper, IRecipeRepository recipeRepository, IRecipeExistenceChecker recipeExistenceChecker)
+        public CreateInstructionHandler(IInstructionRepository instructionRepository, 
+            IMapper mapper, 
+            IRecipeRepository recipeRepository, 
+            IRecipeExistenceChecker recipeExistenceChecker)
         {
             _instructionRepository = instructionRepository;
             _mapper = mapper;

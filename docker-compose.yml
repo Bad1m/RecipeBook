@@ -27,6 +27,14 @@ services:
       context: .
       dockerfile: Microservices/ReviewMicroservice/ReviewMicroservice.API/Dockerfile
 
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: 'rabbitmq'
+
+  cacheserver:
+    image: redis
+    container_name: cacheserver
+
   gateway.recipebookapi:
     image: ${DOCKER_REGISTRY-}gatewayrecipebookapi
     build:

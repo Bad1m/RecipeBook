@@ -15,7 +15,9 @@ namespace RecipeMicroservice.Application.Recipes.QueryHandlers
 
         private readonly IRecipeExistenceChecker _recipeExistenceChecker;
 
-        public GetAllIngredientsByRecipeIdHandler(IIngredientRepository ingredientRepository, IMapper mapper, IRecipeExistenceChecker recipeExistenceChecker)
+        public GetAllIngredientsByRecipeIdHandler(IIngredientRepository ingredientRepository, 
+            IMapper mapper, 
+            IRecipeExistenceChecker recipeExistenceChecker)
         {
             _ingredientRepository = ingredientRepository;
             _mapper = mapper;

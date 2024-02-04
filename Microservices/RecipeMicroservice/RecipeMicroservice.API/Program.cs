@@ -3,6 +3,7 @@ using RecipeMicroservice.API.Extensions;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.RegisterDependencies();
+builder.Services.AddRedis(builder.Configuration);
 builder.Services.ConfigureSqlContext(builder.Configuration);
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();

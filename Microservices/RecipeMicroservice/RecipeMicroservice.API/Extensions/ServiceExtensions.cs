@@ -6,7 +6,9 @@ using RecipeMicroservice.API.ValidationHandler;
 using RecipeMicroservice.Application.Helpers;
 using RecipeMicroservice.Application.Interfaces;
 using RecipeMicroservice.Application.Mappings;
+using RecipeMicroservice.Application.Producers;
 using RecipeMicroservice.Application.Recipes.CommandHandlers.Create;
+using RecipeMicroservice.Domain.Constants;
 using RecipeMicroservice.Infrastructure.Data;
 using RecipeMicroservice.Infrastructure.Interfaces;
 using RecipeMicroservice.Infrastructure.Repositories;
@@ -25,8 +27,24 @@ namespace RecipeMicroservice.API.Extensions
             services.AddScoped<IRecipeRepository, RecipeRepository>();
             services.AddScoped<IInstructionRepository, InstructionRepository>();
             services.AddScoped<IIngredientRepository, IngredientRepository>();
+            services.AddScoped<ICacheRepository, CacheRepository>();
             services.AddAutoMapper(typeof(RecipeMappingProfile).Assembly);
             services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(CreateRecipeHandler).Assembly));
+            services.AddScoped<IRabbitMqProducer>(provider =>
+            {
+                var configuration = provider.GetRequiredService<IConfiguration>();
+
+                return new RabbitMqProducer(RabbitMqConfig.HostName, RabbitMqConfig.ExchangeName, RabbitMqConfig.Key);
+            });
+        }
+
+        public static void AddRedis(this IServiceCollection services, IConfiguration configuration)
+        {
+            services.Configure<CacheOptions>(configuration.GetSection("CacheOptions"));
+            services.AddStackExchangeRedisCache(options =>
+            {
+                options.Configuration = configuration["Redis:Uri"];
+            });
         }
 
         public static void ConfigureSqlContext(this IServiceCollection services, IConfiguration configuration)

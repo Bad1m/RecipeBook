@@ -53,7 +53,7 @@ namespace ReviewMicroservice.Infrastructure.Repositories
             await _context.Reviews.ReplaceOneAsync(filter, updatedReview, updateOptions, cancellationToken);
         }
 
-        public async Task<List<Review>> GetByRecipeIdAsync(string recipeId, PaginationSettings paginationSettings, CancellationToken cancellationToken)
+        public async Task<List<Review>> GetByRecipeIdAsync(int recipeId, PaginationSettings paginationSettings, CancellationToken cancellationToken)
         {
             int skip = (paginationSettings.Page - 1) * paginationSettings.PageSize;
             var pagedReviews = await _context.Reviews.Find(r => r.RecipeId == recipeId)
@@ -62,6 +62,11 @@ namespace ReviewMicroservice.Infrastructure.Repositories
                 .ToListAsync(cancellationToken);
 
             return pagedReviews;
+        }
+
+        public async Task DeleteReviewsByRecipeIdAsync(int recipeId, CancellationToken cancellationToken)
+        {
+            await _context.Reviews.DeleteManyAsync(review => review.RecipeId == recipeId, cancellationToken);
         }
 
         public async Task<bool> IsReviewExistsAsync(string id, CancellationToken cancellationToken)
