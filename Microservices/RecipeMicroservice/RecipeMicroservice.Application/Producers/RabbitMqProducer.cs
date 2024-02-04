@@ -5,7 +5,7 @@ using System.Text;
 
 namespace RecipeMicroservice.Application.Producers
 {
-    public class RabbitMqProducer : IRabbitMqProducer
+    public class RabbitMqProducer : IRabbitMqProducer, IDisposable
     {
         private readonly IConnection _connection;
         private readonly IModel _channel;
@@ -30,6 +30,14 @@ namespace RecipeMicroservice.Application.Producers
             var jsonMessage = JsonConvert.SerializeObject(message);
             var body = Encoding.UTF8.GetBytes(jsonMessage);
             _channel.BasicPublish(_exchangeName, _routingKey, null, body);
+        }
+
+        public void Dispose()
+        {
+            _channel.Close();
+            _connection.Close();
+            _channel.Dispose();
+            _connection.Dispose();
         }
     }
 }

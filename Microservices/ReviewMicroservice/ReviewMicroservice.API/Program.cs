@@ -3,6 +3,7 @@ using ReviewMicroservice.API.Extensions;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.RegisterDependencies();
+builder.Services.ConfigureRabbitMq(builder.Configuration);
 builder.Services.AddRedis(builder.Configuration);
 builder.Services.ConfigureMongoDBContext(builder.Configuration);
 builder.Services.AddControllers();

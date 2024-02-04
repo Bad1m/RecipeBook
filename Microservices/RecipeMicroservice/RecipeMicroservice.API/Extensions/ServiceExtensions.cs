@@ -1,6 +1,7 @@
 ﻿using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using RecipeMicroservice.API.ValidationHandler;
 using RecipeMicroservice.Application.Helpers;
@@ -8,7 +9,7 @@ using RecipeMicroservice.Application.Interfaces;
 using RecipeMicroservice.Application.Mappings;
 using RecipeMicroservice.Application.Producers;
 using RecipeMicroservice.Application.Recipes.CommandHandlers.Create;
-using RecipeMicroservice.Domain.Constants;
+using RecipeMicroservice.Domain.Settings;
 using RecipeMicroservice.Infrastructure.Data;
 using RecipeMicroservice.Infrastructure.Interfaces;
 using RecipeMicroservice.Infrastructure.Repositories;
@@ -30,11 +31,20 @@ namespace RecipeMicroservice.API.Extensions
             services.AddScoped<ICacheRepository, CacheRepository>();
             services.AddAutoMapper(typeof(RecipeMappingProfile).Assembly);
             services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(CreateRecipeHandler).Assembly));
+        }
+
+        public static void ConfigureRabbitMq(this IServiceCollection services, IConfiguration configuration)
+        {
+            services.Configure<RabbitMqConfig>(configuration.GetSection("RabbitMqConfig"));
             services.AddScoped<IRabbitMqProducer>(provider =>
             {
-                var configuration = provider.GetRequiredService<IConfiguration>();
+                var rabbitMqConfig = provider.GetRequiredService<IOptions<RabbitMqConfig>>().Value;
 
-                return new RabbitMqProducer(RabbitMqConfig.HostName, RabbitMqConfig.ExchangeName, RabbitMqConfig.Key);
+                return new RabbitMqProducer(
+                    rabbitMqConfig.HostName,
+                    rabbitMqConfig.ExchangeName,
+                    rabbitMqConfig.Key
+                );
             });
         }
 

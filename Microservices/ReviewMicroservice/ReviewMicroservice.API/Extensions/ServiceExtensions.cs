@@ -10,7 +10,6 @@ using ReviewMicroservice.Infrastructure.Interfaces;
 using ReviewMicroservice.Infrastructure.Repositories;
 using SharpGrip.FluentValidation.AutoValidation.Mvc.Extensions;
 using ReviewMicroservice.Application.Consumers;
-using ReviewMicroservice.Domain.Constants;
 
 namespace ReviewMicroservice.API.Extensions
 {
@@ -24,15 +23,21 @@ namespace ReviewMicroservice.API.Extensions
             services.AddScoped<IReviewService, ReviewService>();
             services.AddScoped<ICacheRepository, CacheRepository>();
             services.AddAutoMapper(typeof(ReviewMappingProfile));
+        }
+
+        public static void ConfigureRabbitMq(this IServiceCollection services, IConfiguration configuration)
+        {
+            services.Configure<RabbitMqConfig>(configuration.GetSection("RabbitMqConfig"));
             services.AddScoped<IRabbitMqConsumer>(provider =>
             {
                 var reviewRepository = provider.GetRequiredService<IReviewRepository>();
+                var rabbitMqConfig = provider.GetRequiredService<IOptions<RabbitMqConfig>>().Value;
 
                 return new RabbitMqConsumer(
-                    RabbitMqConfig.HostName,
-                    RabbitMqConfig.ExchangeName,
-                    RabbitMqConfig.DeleteQueue,
-                    RabbitMqConfig.Key,
+                    rabbitMqConfig.HostName,
+                    rabbitMqConfig.ExchangeName,
+                    rabbitMqConfig.DeleteQueue,
+                    rabbitMqConfig.Key,
                     reviewRepository
                 );
             });

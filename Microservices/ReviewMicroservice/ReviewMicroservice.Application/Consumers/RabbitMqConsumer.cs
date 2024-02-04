@@ -9,7 +9,7 @@ using ReviewMicroservice.Application.Interfaces;
 
 namespace ReviewMicroservice.Application.Consumers
 {
-    public class RabbitMqConsumer : IRabbitMqConsumer
+    public class RabbitMqConsumer : IRabbitMqConsumer, IDisposable
     {
         private readonly IConnection _connection;
         private readonly IModel _channel;
@@ -44,18 +44,18 @@ namespace ReviewMicroservice.Application.Consumers
         public void StartConsuming()
         {
             var consumer = new EventingBasicConsumer(_channel);
-            consumer.Received += (model, ea) =>
+            consumer.Received += async (model, ea) =>
             {
                 var body = ea.Body.ToArray();
                 var message = Encoding.UTF8.GetString(body);
                 var recipeDeletedMessage = JsonConvert.DeserializeObject<RecipeDeletedMessage>(message);
-                ProcessMessage(recipeDeletedMessage);
+                await ProcessMessageAsync(recipeDeletedMessage);
                 _channel.BasicAck(ea.DeliveryTag, multiple: false);
             };
             _channel.BasicConsume(queue: _queueName, autoAck: false, consumer: consumer);
         }
 
-        private async void ProcessMessage(RecipeDeletedMessage recipeDeletedMessage)
+        private async Task ProcessMessageAsync(RecipeDeletedMessage recipeDeletedMessage)
         {
             var reviewsExist = await _reviewRepository.GetByRecipeIdAsync(recipeDeletedMessage.RecipeId, new PaginationSettings { }, CancellationToken.None);
 
@@ -63,6 +63,14 @@ namespace ReviewMicroservice.Application.Consumers
             {
                 await _reviewRepository.DeleteReviewsByRecipeIdAsync(recipeDeletedMessage.RecipeId, CancellationToken.None);
             }
+        }
+
+        public void Dispose()
+        {
+            _channel?.Close();
+            _connection?.Close();
+            _channel?.Dispose();
+            _connection?.Dispose();
         }
     }
 }
