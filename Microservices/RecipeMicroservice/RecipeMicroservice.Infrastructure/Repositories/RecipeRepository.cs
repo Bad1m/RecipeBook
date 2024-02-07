@@ -24,6 +24,16 @@ namespace RecipeMicroservice.Infrastructure.Repositories
                 .ToListAsync(cancellationToken);
         }
 
+        public async Task<IEnumerable<Recipe>> GetRecipesByUserNameAsync(string userName, CancellationToken cancellationToken)
+        {
+            return await _dbSet.AsNoTracking()
+                .Include(recipe => recipe.RecipeIngredients)
+                    .ThenInclude(recipe => recipe.Ingredient)
+                .Include(recipe => recipe.Instructions)
+                .Where(recipe => recipe.User != null && recipe.User.UserName == userName)
+                .ToListAsync(cancellationToken);
+        }
+
         public override async Task<Recipe> GetByIdAsync(int id, CancellationToken cancellationToken)
         {
             return await _dbSet.AsNoTracking()

@@ -29,6 +29,15 @@ namespace RecipeMicroservice.API.Controllers
             return Ok(result);
         }
 
+        [HttpGet("userName/{userName}")]
+        public async Task<IActionResult> GetAllRecipesByUserNameAsync([FromRoute] string userName, [FromQuery] PaginationSettings paginationSettings, CancellationToken cancellationToken)
+        {
+            var query = new GetAllRecipesByUserNameQuery { PaginationSettings = paginationSettings, UserName = userName };
+            var result = await _mediator.Send(query, cancellationToken);
+
+            return Ok(result);
+        }
+
         [HttpGet("{id}")]
         public async Task<IActionResult> GetRecipeByIdAsync([FromRoute] int id, CancellationToken cancellationToken)
         {

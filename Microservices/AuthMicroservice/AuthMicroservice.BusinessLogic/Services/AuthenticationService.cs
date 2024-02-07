@@ -1,5 +1,6 @@
 ﻿using AuthMicroservice.BusinessLogic.Constants;
 using AuthMicroservice.BusinessLogic.Dtos;
+using AuthMicroservice.BusinessLogic.Grpc;
 using AuthMicroservice.BusinessLogic.Interfaces;
 using AuthMicroservice.BusinessLogic.Models;
 using AuthMicroservice.DataAccess.Entities;
@@ -12,14 +13,26 @@ namespace AuthMicroservice.BusinessLogic.Services
     public class AuthenticationService : IAuthenticationService
     {
         private readonly UserManager<User> _userManager;
+
         private readonly IMapper _mapper;
+
         private readonly IJWTService _jwtService;
-    
-        public AuthenticationService(UserManager<User> userManager, IMapper mapper, IJWTService jwtService)
+
+        private readonly GrpcUserReviewClient _userReviewClient;
+
+        private readonly GrpcUserRecipeClient _userRecipeClient;
+
+        public AuthenticationService(UserManager<User> userManager, 
+            IMapper mapper, 
+            IJWTService jwtService,
+            GrpcUserReviewClient userReviewClient, 
+            GrpcUserRecipeClient userRecipeClient)
         {
             _userManager = userManager;
             _mapper = mapper;
             _jwtService = jwtService;
+            _userRecipeClient = userRecipeClient;
+            _userReviewClient = userReviewClient;
         }
 
         public async Task<UserDto> RegisterUserAsync(UserRegistrationDto userRegistration)
@@ -45,6 +58,9 @@ namespace AuthMicroservice.BusinessLogic.Services
             {
                 throw new InvalidOperationException(ErrorMessages.UserRegistrationFailed);
             }
+
+            await _userRecipeClient.CreateUserAsync(user);
+            await _userReviewClient.CreateUser(user);
 
             return _mapper.Map<UserDto>(user);
         }

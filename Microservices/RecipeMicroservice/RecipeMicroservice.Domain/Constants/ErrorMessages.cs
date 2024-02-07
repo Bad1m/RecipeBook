@@ -19,5 +19,6 @@
         public const string InstructionNotFound = "Instruction not found.";
         public const string IngredientWithSameNameExists = "Ingredient with same name exists.";
         public const string StepNumberMustBeUnique = "StepNumber must be unique within the recipe.";
+        public const string UserNotFound = "User not found.";
     }
 }

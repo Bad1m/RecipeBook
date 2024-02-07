@@ -1,9 +1,13 @@
 ﻿using FluentValidation;
+using Grpc.Net.Client;
 using MediatR;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using RecipeMicroservice.API.ValidationHandler;
+using RecipeMicroservice.Application.Grpc;
+using RecipeMicroservice.Application.Grpc.Protos;
 using RecipeMicroservice.Application.Helpers;
 using RecipeMicroservice.Application.Interfaces;
 using RecipeMicroservice.Application.Mappings;
@@ -13,7 +17,7 @@ using RecipeMicroservice.Domain.Settings;
 using RecipeMicroservice.Infrastructure.Data;
 using RecipeMicroservice.Infrastructure.Interfaces;
 using RecipeMicroservice.Infrastructure.Repositories;
-using SharpGrip.FluentValidation.AutoValidation.Mvc.Extensions;
+using System.Net;
 
 namespace RecipeMicroservice.API.Extensions
 {
@@ -22,15 +26,22 @@ namespace RecipeMicroservice.API.Extensions
         public static void RegisterDependencies(this IServiceCollection services)
         {
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
-            services.AddFluentValidationAutoValidation();
             services.AddValidatorsFromAssemblies(AppDomain.CurrentDomain.GetAssemblies(), ServiceLifetime.Scoped);
             services.AddScoped<IRecipeExistenceChecker, RecipeExistenceChecker>();
             services.AddScoped<IRecipeRepository, RecipeRepository>();
+            services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IInstructionRepository, InstructionRepository>();
             services.AddScoped<IIngredientRepository, IngredientRepository>();
             services.AddScoped<ICacheRepository, CacheRepository>();
             services.AddAutoMapper(typeof(RecipeMappingProfile).Assembly);
             services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(CreateRecipeHandler).Assembly));
+            services.AddScoped<GrpcRecipeClient>();
+        }
+
+        public static void AddGrpcClient(this IServiceCollection services, IConfiguration configuration)
+        {
+            var grpcChannel = GrpcChannel.ForAddress(configuration["GrpcHost"]);
+            services.AddSingleton(services => new GrpcRecipe.GrpcRecipeClient(grpcChannel));
         }
 
         public static void ConfigureRabbitMq(this IServiceCollection services, IConfiguration configuration)
@@ -67,6 +78,23 @@ namespace RecipeMicroservice.API.Extensions
             var serviceProvider = services.BuildServiceProvider();
             var recipeContext = serviceProvider.GetRequiredService<RecipeContext>();
             recipeContext.Database.Migrate();
+        }
+
+        public static WebApplicationBuilder ConfigureKestrel(this WebApplicationBuilder builder)
+        {
+            builder.WebHost.UseKestrel(options =>
+            {
+                options.Listen(IPAddress.Any, 80, listenOptions =>
+                {
+                    listenOptions.Protocols = HttpProtocols.Http1;
+                });
+                options.Listen(IPAddress.Any, 8086, listenOptions =>
+                {
+                    listenOptions.Protocols = HttpProtocols.Http2;
+                });
+            });
+
+            return builder;
         }
 
         public static void ConfigureSwagger(this IServiceCollection services)

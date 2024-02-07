@@ -6,6 +6,8 @@ namespace RecipeMicroservice.Infrastructure.Data
 {
     public class RecipeContext : DbContext
     {
+        public DbSet<User> Users { get; set; }
+
         public DbSet<Ingredient> Ingredients { get; set; }
 
         public DbSet<Instruction> Instructions { get; set; }

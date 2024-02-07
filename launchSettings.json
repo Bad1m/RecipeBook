@@ -3,16 +3,15 @@
     "Docker Compose": {
       "commandName": "DockerCompose",
       "commandVersion": "1.0",
-      "composeLaunchAction": "LaunchBrowser",
-      "composeLaunchServiceName": "gateway.recipebookapi",
-      "composeLaunchUrl": "{Scheme}://localhost:{ServicePort}/swagger",
       "serviceActions": {
         "authmicroservice.api": "StartDebugging",
         "recipemicroservice.api": "StartDebugging",
         "reviewmicroservice.api": "StartDebugging",
         "sqlserver": "StartWithoutDebugging",
         "reviewsdb": "StartWithoutDebugging",
-        "gateway.recipebookapi": "StartDebugging"
+        "gateway.recipebookapi": "StartDebugging",
+        "cacheserver": "StartWithoutDebugging",
+        "rabbitmq": "StartWithoutDebugging"
       }
     }
   }

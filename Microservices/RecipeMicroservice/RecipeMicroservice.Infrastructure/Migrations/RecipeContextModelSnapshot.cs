@@ -17,7 +17,7 @@ namespace RecipeMicroservice.Infrastructure.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.0")
+                .HasAnnotation("ProductVersion", "8.0.1")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -88,7 +88,12 @@ namespace RecipeMicroservice.Infrastructure.Migrations
                     b.Property<TimeSpan>("PrepTime")
                         .HasColumnType("time");
 
+                    b.Property<int?>("UserId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Recipes");
                 });
@@ -111,6 +116,22 @@ namespace RecipeMicroservice.Infrastructure.Migrations
                     b.ToTable("RecipeIngredients");
                 });
 
+            modelBuilder.Entity("RecipeMicroservice.Domain.Entities.User", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("UserName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Users");
+                });
+
             modelBuilder.Entity("RecipeMicroservice.Domain.Entities.Instruction", b =>
                 {
                     b.HasOne("RecipeMicroservice.Domain.Entities.Recipe", "Recipe")
@@ -119,6 +140,15 @@ namespace RecipeMicroservice.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("Recipe");
+                });
+
+            modelBuilder.Entity("RecipeMicroservice.Domain.Entities.Recipe", b =>
+                {
+                    b.HasOne("RecipeMicroservice.Domain.Entities.User", "User")
+                        .WithMany("Recipes")
+                        .HasForeignKey("UserId");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("RecipeMicroservice.Domain.Entities.RecipeIngredient", b =>
@@ -150,6 +180,11 @@ namespace RecipeMicroservice.Infrastructure.Migrations
                     b.Navigation("Instructions");
 
                     b.Navigation("RecipeIngredients");
+                });
+
+            modelBuilder.Entity("RecipeMicroservice.Domain.Entities.User", b =>
+                {
+                    b.Navigation("Recipes");
                 });
 #pragma warning restore 612, 618
         }
