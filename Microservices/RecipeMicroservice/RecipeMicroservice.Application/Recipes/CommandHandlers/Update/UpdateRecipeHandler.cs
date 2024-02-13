@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Hangfire;
 using MediatR;
 using RecipeMicroservice.Application.Dtos;
 using RecipeMicroservice.Application.Interfaces;
@@ -19,7 +20,15 @@ namespace RecipeMicroservice.Application.Recipes.CommandHandlers.Update
         
         private readonly ICacheRepository _cacheRepository;
 
-        public UpdateRecipeHandler(IRecipeRepository recipeRepository, IMapper mapper, IRecipeExistenceChecker recipeExistenceChecker, ICacheRepository cacheRepository)
+        private readonly GrpcRecipeClient _recipeClient;
+        
+        private readonly IBackgroundJobClient _backgroundJobClient;
+
+        public UpdateRecipeHandler(IRecipeRepository recipeRepository, 
+            IMapper mapper, 
+            IRecipeExistenceChecker recipeExistenceChecker, 
+            ICacheRepository cacheRepository,
+            GrpcRecipeClient recipeClient)
         {
             _recipeRepository = recipeRepository;
             _mapper = mapper;
@@ -32,7 +41,8 @@ namespace RecipeMicroservice.Application.Recipes.CommandHandlers.Update
             await _recipeExistenceChecker.CheckRecipeExistenceAsync(request.Id, cancellationToken);
             var recipe = _mapper.Map<Recipe>(request);
             await _recipeRepository.UpdateAsync(recipe, cancellationToken);
-            await _cacheRepository.RemoveAsync(CacheKeys.Recipes);
+            _backgroundJobClient.Enqueue(() => _cacheRepository.RemoveAsync(CacheKeys.Recipes));
+            await _recipeClient.UpdateRecipeAsync(request.Id, recipe);
 
             return _mapper.Map<RecipeDto>(recipe);
         }

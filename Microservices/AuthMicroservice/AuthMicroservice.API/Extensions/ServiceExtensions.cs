@@ -30,8 +30,7 @@ namespace AuthMicroservice.API.Extensions
 
         public static void ConfigureSqlContext(this IServiceCollection services, IConfiguration configuration)
         {
-            var isDocker = Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER") == "true";
-            var connectionString = isDocker ? configuration.GetConnectionString("DockerConnection") : configuration.GetConnectionString("DefaultConnection");
+            var connectionString = configuration.GetConnectionString("DefaultConnection");
             services.AddDbContext<AuthContext>(opts =>
                 opts.UseSqlServer(connectionString, sqlServerOptions =>
                     sqlServerOptions.MigrationsAssembly("AuthMicroservice.DataAccess"))

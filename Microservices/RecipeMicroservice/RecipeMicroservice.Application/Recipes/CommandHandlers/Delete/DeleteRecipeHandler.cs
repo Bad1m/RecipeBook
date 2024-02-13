@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using Hangfire;
+using MediatR;
 using RecipeMicroservice.Application.Interfaces;
 using RecipeMicroservice.Application.Messages;
 using RecipeMicroservice.Application.Recipes.Commands.Delete;
@@ -15,7 +16,9 @@ namespace RecipeMicroservice.Application.Recipes.CommandHandlers.Delete
 
         private readonly IRabbitMqProducer _rabbitMqProducer;
 
-        private readonly ICacheRepository _cacheRepository;
+        private readonly ICacheRepository _cacheRepository; 
+        
+        private readonly IBackgroundJobClient _backgroundJobClient;
 
         public DeleteRecipeHandler(IRecipeRepository recipeRepository, IRecipeExistenceChecker recipeExistenceChecker, IRabbitMqProducer rabbitMqProducer, ICacheRepository cacheRepository)
         {
@@ -30,7 +33,7 @@ namespace RecipeMicroservice.Application.Recipes.CommandHandlers.Delete
             var recipe = await _recipeExistenceChecker.CheckRecipeExistenceAsync(request.Id, cancellationToken);
             await _recipeRepository.DeleteAsync(recipe.Id, cancellationToken);
             await _recipeRepository.SaveChangesAsync(cancellationToken);
-            await _cacheRepository.RemoveAsync(CacheKeys.Recipes);
+            _backgroundJobClient.Enqueue(() => _cacheRepository.RemoveAsync(CacheKeys.Recipes));
             _rabbitMqProducer.SendMessage(new RecipeDeletedMessage
             {
                 RecipeId = request.Id

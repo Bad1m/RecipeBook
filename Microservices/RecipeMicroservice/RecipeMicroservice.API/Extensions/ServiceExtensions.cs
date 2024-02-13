@@ -1,4 +1,6 @@
 ﻿using FluentValidation;
+using Grpc.Net.Client;
+using Hangfire;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -31,6 +33,22 @@ namespace RecipeMicroservice.API.Extensions
             services.AddScoped<ICacheRepository, CacheRepository>();
             services.AddAutoMapper(typeof(RecipeMappingProfile).Assembly);
             services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(CreateRecipeHandler).Assembly));
+            services.AddScoped<GrpcRecipeClient>();
+        }
+
+        public static void AddHangfire(this IServiceCollection services, IConfiguration configuration)
+        {
+            services.AddHangfire(hangfire =>
+            {
+                hangfire.UseSqlServerStorage(configuration.GetConnectionString("HangfireConnection"));
+            });
+            services.AddHangfireServer();
+        }
+
+        public static void AddGrpcClient(this IServiceCollection services, IConfiguration configuration)
+        {
+            var grpcChannel = GrpcChannel.ForAddress(configuration["GrpcHost"]);
+            services.AddSingleton(services => new GrpcRecipe.GrpcRecipeClient(grpcChannel));
         }
 
         public static void ConfigureRabbitMq(this IServiceCollection services, IConfiguration configuration)
