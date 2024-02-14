@@ -1,10 +1,12 @@
-﻿using AuthMicroservice.BusinessLogic.Interfaces;
+﻿using AuthMicroservice.BusinessLogic.BackgroundJobs;
+using AuthMicroservice.BusinessLogic.Interfaces;
 using AuthMicroservice.BusinessLogic.Mappings;
 using AuthMicroservice.BusinessLogic.Models;
 using AuthMicroservice.BusinessLogic.Services;
 using AuthMicroservice.DataAccess.Data;
 using AuthMicroservice.DataAccess.Entities;
 using FluentValidation;
+using Hangfire;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -26,6 +28,23 @@ namespace AuthMicroservice.API.Extensions
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IAuthenticationService, AuthenticationService>();
             services.AddAutoMapper(typeof(UserMappingProfile));
+        }
+
+        public static void AddHangfire(this IServiceCollection services, IConfiguration configuration)
+        {
+            services.AddHangfire(hangfire =>
+            {
+                hangfire.SetDataCompatibilityLevel(CompatibilityLevel.Version_180);
+                hangfire.UseSimpleAssemblyNameTypeSerializer();
+                hangfire.UseRecommendedSerializerSettings();
+                hangfire.UseSqlServerStorage(configuration.GetConnectionString("HangfireConnection"));
+            });
+            services.AddHangfireServer();
+            services.AddScoped<CleanExpiredRefreshTokensJob>();
+            var serviceProvider = services.BuildServiceProvider();
+            var cleanExpiredRefreshTokensJob = serviceProvider.GetRequiredService<CleanExpiredRefreshTokensJob>();
+
+            RecurringJob.AddOrUpdate("clean-expired-tokens", () => cleanExpiredRefreshTokensJob.Execute(), Cron.Daily);
         }
 
         public static void ConfigureSqlContext(this IServiceCollection services, IConfiguration configuration)

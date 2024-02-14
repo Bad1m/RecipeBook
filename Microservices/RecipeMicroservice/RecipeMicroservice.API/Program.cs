@@ -1,4 +1,3 @@
-using Hangfire;
 using RecipeMicroservice.API.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);

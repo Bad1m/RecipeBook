@@ -59,7 +59,6 @@ namespace AuthMicroservice.BusinessLogic.Services
             return new JwtSecurityTokenHandler().WriteToken(tokenOptions);
         }
 
-
         private SigningCredentials GetSigningCredentials()
         {
             var key = Encoding.UTF8.GetBytes(_authSettings.Secret);

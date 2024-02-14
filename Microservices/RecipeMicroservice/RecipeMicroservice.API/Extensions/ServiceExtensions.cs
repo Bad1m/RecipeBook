@@ -36,15 +36,6 @@ namespace RecipeMicroservice.API.Extensions
             services.AddScoped<GrpcRecipeClient>();
         }
 
-        public static void AddHangfire(this IServiceCollection services, IConfiguration configuration)
-        {
-            services.AddHangfire(hangfire =>
-            {
-                hangfire.UseSqlServerStorage(configuration.GetConnectionString("HangfireConnection"));
-            });
-            services.AddHangfireServer();
-        }
-
         public static void AddGrpcClient(this IServiceCollection services, IConfiguration configuration)
         {
             var grpcChannel = GrpcChannel.ForAddress(configuration["GrpcHost"]);

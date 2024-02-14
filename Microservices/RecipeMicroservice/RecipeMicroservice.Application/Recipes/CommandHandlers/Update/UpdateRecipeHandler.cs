@@ -41,7 +41,7 @@ namespace RecipeMicroservice.Application.Recipes.CommandHandlers.Update
             await _recipeExistenceChecker.CheckRecipeExistenceAsync(request.Id, cancellationToken);
             var recipe = _mapper.Map<Recipe>(request);
             await _recipeRepository.UpdateAsync(recipe, cancellationToken);
-            _backgroundJobClient.Enqueue(() => _cacheRepository.RemoveAsync(CacheKeys.Recipes));
+            await _cacheRepository.RemoveAsync(CacheKeys.Recipes);
             await _recipeClient.UpdateRecipeAsync(request.Id, recipe);
 
             return _mapper.Map<RecipeDto>(recipe);

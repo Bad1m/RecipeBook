@@ -1,8 +1,10 @@
 using AuthMicroservice.API.Extensions;
+using Hangfire;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.RegisterDependencies();
+builder.Services.AddHangfire(builder.Configuration);
 builder.Services.ConfigureSqlContext(builder.Configuration);
 builder.Services.AddAuthentication();
 builder.Services.ConfigureIdentity();
@@ -26,6 +28,8 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.UseHangfireDashboard();
 
 app.ConfigureExceptionHandler();
 
