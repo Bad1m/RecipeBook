@@ -1,0 +1,22 @@
+﻿syntax = "proto3";
+
+option csharp_namespace = "ReviewMicroservice.Application.Grpc.Protos";
+
+service GrpcRecipe {
+    rpc CreateRecipe(CreateRecipeRequest) returns (RecipeDto);
+    rpc UpdateRecipe(UpdateRecipeRequest) returns (RecipeDto);
+}
+
+message RecipeDto {
+    int32 id = 1;
+    string dish = 2;
+}
+
+message CreateRecipeRequest {
+    RecipeDto recipe = 1;
+}
+
+message UpdateRecipeRequest {
+    int32 id = 1;
+    RecipeDto updatedRecipe = 2;
+}

@@ -30,35 +30,15 @@ namespace AuthMicroservice.API.Extensions
 
         private static HttpStatusCode GetStatusCode(Exception ex)
         {
-            if (ex is KeyNotFoundException)
+            return ex switch
             {
-                return HttpStatusCode.NotFound;
-            }
-
-            else if (ex is UnauthorizedAccessException)
-            {
-                return HttpStatusCode.Unauthorized;
-            }
-
-            else if (ex is SecurityException)
-            {
-                return HttpStatusCode.Forbidden;
-            }
-
-            else if (ex is ArgumentException)
-            {
-                return HttpStatusCode.BadRequest;
-            }
-
-            else if (ex is NotImplementedException)
-            {
-                return HttpStatusCode.NotImplemented;
-            }
-
-            else
-            {
-                return HttpStatusCode.InternalServerError;
-            }
+                KeyNotFoundException => HttpStatusCode.NotFound,
+                UnauthorizedAccessException => HttpStatusCode.Unauthorized,
+                SecurityException => HttpStatusCode.Forbidden,
+                ArgumentException => HttpStatusCode.BadRequest,
+                NotImplementedException => HttpStatusCode.NotImplemented,
+                _ => HttpStatusCode.InternalServerError,
+            };
         }
     }
 }

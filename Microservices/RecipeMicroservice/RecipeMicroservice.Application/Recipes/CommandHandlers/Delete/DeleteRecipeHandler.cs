@@ -17,7 +17,10 @@ namespace RecipeMicroservice.Application.Recipes.CommandHandlers.Delete
 
         private readonly ICacheRepository _cacheRepository;
 
-        public DeleteRecipeHandler(IRecipeRepository recipeRepository, IRecipeExistenceChecker recipeExistenceChecker, IRabbitMqProducer rabbitMqProducer, ICacheRepository cacheRepository)
+        public DeleteRecipeHandler(IRecipeRepository recipeRepository, 
+            IRecipeExistenceChecker recipeExistenceChecker, 
+            IRabbitMqProducer rabbitMqProducer, 
+            ICacheRepository cacheRepository)
         {
             _recipeRepository = recipeRepository;
             _recipeExistenceChecker = recipeExistenceChecker;

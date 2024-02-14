@@ -6,6 +6,7 @@ using Newtonsoft.Json;
 using ReviewMicroservice.Infrastructure.Interfaces;
 using ReviewMicroservice.Domain.Settings;
 using ReviewMicroservice.Application.Interfaces;
+using ReviewMicroservice.Domain.Constants;
 
 namespace ReviewMicroservice.Application.Consumers
 {
@@ -17,13 +18,17 @@ namespace ReviewMicroservice.Application.Consumers
         private readonly string _queueName;
         private readonly string _routingKey;
         private readonly IReviewRepository _reviewRepository;
+        private readonly ICacheRepository _cacheRepository;
+        private readonly IRecipeRepository _recipeRepository;
 
         public RabbitMqConsumer(
             string rabbitMqConnectionString,
             string exchangeName,
             string queueName,
             string routingKey,
-            IReviewRepository reviewRepository)
+            IReviewRepository reviewRepository,
+            ICacheRepository cacheRepository,
+            IRecipeRepository recipeRepository)
         {
             var factory = new ConnectionFactory
             {
@@ -39,6 +44,8 @@ namespace ReviewMicroservice.Application.Consumers
             _channel.ExchangeDeclare(exchange: _exchangeName, type: ExchangeType.Direct);
             _channel.QueueDeclare(queue: _queueName, durable: true, exclusive: false, autoDelete: false, arguments: null);
             _channel.QueueBind(queue: _queueName, exchange: _exchangeName, routingKey: _routingKey);
+            _cacheRepository = cacheRepository;
+            _recipeRepository = recipeRepository;
         }
 
         public void StartConsuming()
@@ -57,11 +64,13 @@ namespace ReviewMicroservice.Application.Consumers
 
         private async Task ProcessMessageAsync(RecipeDeletedMessage recipeDeletedMessage)
         {
+            await _recipeRepository.DeleteByIdAsync(recipeDeletedMessage.RecipeId, CancellationToken.None);
             var reviewsExist = await _reviewRepository.GetByRecipeIdAsync(recipeDeletedMessage.RecipeId, new PaginationSettings { }, CancellationToken.None);
 
             if (reviewsExist.Count != 0)
             {
                 await _reviewRepository.DeleteReviewsByRecipeIdAsync(recipeDeletedMessage.RecipeId, CancellationToken.None);
+                await _cacheRepository.RemoveAsync(CacheKeys.Reviews);
             }
         }
 

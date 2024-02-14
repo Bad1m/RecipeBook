@@ -1,10 +1,13 @@
-﻿using AuthMicroservice.BusinessLogic.Interfaces;
+﻿using AuthMicroservice.BusinessLogic.Grpc;
+using AuthMicroservice.BusinessLogic.Grpc.Protos;
+using AuthMicroservice.BusinessLogic.Interfaces;
 using AuthMicroservice.BusinessLogic.Mappings;
 using AuthMicroservice.BusinessLogic.Models;
 using AuthMicroservice.BusinessLogic.Services;
 using AuthMicroservice.DataAccess.Data;
 using AuthMicroservice.DataAccess.Entities;
 using FluentValidation;
+using Grpc.Net.Client;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -26,6 +29,8 @@ namespace AuthMicroservice.API.Extensions
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IAuthenticationService, AuthenticationService>();
             services.AddAutoMapper(typeof(UserMappingProfile));
+            services.AddScoped<GrpcUserRecipeClient>();
+            services.AddScoped<GrpcUserReviewClient>();
         }
 
         public static void ConfigureSqlContext(this IServiceCollection services, IConfiguration configuration)
@@ -75,6 +80,18 @@ namespace AuthMicroservice.API.Extensions
             })
             .AddEntityFrameworkStores<AuthContext>()
             .AddDefaultTokenProviders();
+        }
+
+        public static void AddReviewGrpcClient(this IServiceCollection services, IConfiguration configuration)
+        {
+            var grpcChannel = GrpcChannel.ForAddress(configuration["GrpcReviewHost"]);
+            services.AddSingleton(services => new GrpcUserReview.GrpcUserReviewClient(grpcChannel));
+        }
+
+        public static void AddRecipeGrpcClient(this IServiceCollection services, IConfiguration configuration)
+        {
+            var grpcChannel = GrpcChannel.ForAddress(configuration["GrpcRecipeHost"]);
+            services.AddSingleton(services => new GrpcUserRecipe.GrpcUserRecipeClient(grpcChannel));
         }
 
         public static void ConfigureSwagger(this IServiceCollection services)
