@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Hangfire;
 using MediatR;
 using RecipeMicroservice.Application.Dtos;
 using RecipeMicroservice.Application.Grpc;
@@ -21,6 +22,8 @@ namespace RecipeMicroservice.Application.Recipes.CommandHandlers.Update
         private readonly ICacheRepository _cacheRepository;
 
         private readonly GrpcRecipeClient _recipeClient;
+        
+        private readonly IBackgroundJobClient _backgroundJobClient;
 
         public UpdateRecipeHandler(IRecipeRepository recipeRepository, 
             IMapper mapper, 

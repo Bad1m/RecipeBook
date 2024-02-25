@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using Grpc.Net.Client;
+using Hangfire;
 using MediatR;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.EntityFrameworkCore;

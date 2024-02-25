@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using Hangfire;
+using MediatR;
 using RecipeMicroservice.Application.Interfaces;
 using RecipeMicroservice.Application.Messages;
 using RecipeMicroservice.Application.Recipes.Commands.Delete;

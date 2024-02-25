@@ -1,8 +1,10 @@
 using AuthMicroservice.API.Extensions;
+using Hangfire;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.RegisterDependencies();
+builder.Services.AddHangfire(builder.Configuration);
 builder.Services.AddReviewGrpcClient(builder.Configuration);
 builder.Services.AddRecipeGrpcClient(builder.Configuration);
 builder.Services.ConfigureSqlContext(builder.Configuration);
@@ -28,6 +30,8 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.UseHangfireDashboard();
 
 app.ConfigureExceptionHandler();
 
