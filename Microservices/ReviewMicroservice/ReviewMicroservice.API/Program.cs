@@ -1,4 +1,5 @@
 using ReviewMicroservice.API.Extensions;
+using ReviewMicroservice.Application.Grpc;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,8 +11,11 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.ConfigureSwagger();
 builder.Services.AddSwaggerGen();
+builder.Services.AddGrpc();
 
-var app = builder.Build();
+var app = builder
+    .ConfigureKestrel()
+    .Build();
 
 if (app.Environment.IsDevelopment())
 {
@@ -24,6 +28,9 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.MapGrpcService<GrpcRecipeService>();
+app.MapGrpcService<GrpcUserService>();
 
 app.ConfigureExceptionHandler();
 

@@ -10,6 +10,7 @@ namespace RecipeMicroservice.Application.Recipes.Commands.Create
         public string? Description { get; set; }
         public TimeSpan PrepTime { get; set; }
         public string? Img { get; set; }
+        public string? UserName { get; set; }
         public ICollection<CreateRecipeIngredientCommand> RecipeIngredients { get; set; }
         public ICollection<CreateInstructionCommand>? Instructions { get; set; }
     }

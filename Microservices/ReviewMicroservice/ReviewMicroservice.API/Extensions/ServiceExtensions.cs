@@ -10,6 +10,9 @@ using ReviewMicroservice.Infrastructure.Interfaces;
 using ReviewMicroservice.Infrastructure.Repositories;
 using SharpGrip.FluentValidation.AutoValidation.Mvc.Extensions;
 using ReviewMicroservice.Application.Consumers;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
+using System.Net;
+using ReviewMicroservice.Application.Grpc;
 
 namespace ReviewMicroservice.API.Extensions
 {
@@ -20,9 +23,30 @@ namespace ReviewMicroservice.API.Extensions
             services.AddFluentValidationAutoValidation();
             services.AddValidatorsFromAssemblies(AppDomain.CurrentDomain.GetAssemblies(), ServiceLifetime.Scoped);
             services.AddScoped<IReviewRepository, ReviewRepository>();
+            services.AddScoped<IRecipeRepository, RecipeRepository>();
+            services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IReviewService, ReviewService>();
             services.AddScoped<ICacheRepository, CacheRepository>();
             services.AddAutoMapper(typeof(ReviewMappingProfile));
+            services.AddScoped<GrpcRecipeService>();
+            services.AddScoped<GrpcUserService>();
+        }
+
+        public static WebApplicationBuilder ConfigureKestrel(this WebApplicationBuilder builder)
+        {
+            builder.WebHost.UseKestrel(options =>
+            {
+                options.Listen(IPAddress.Any, 80, listenOptions =>
+                {
+                    listenOptions.Protocols = HttpProtocols.Http1;
+                });
+                options.Listen(IPAddress.Any, 8087, listenOptions =>
+                {
+                    listenOptions.Protocols = HttpProtocols.Http2;
+                });
+            });
+
+            return builder;
         }
 
         public static void ConfigureRabbitMq(this IServiceCollection services, IConfiguration configuration)
@@ -31,14 +55,18 @@ namespace ReviewMicroservice.API.Extensions
             services.AddScoped<IRabbitMqConsumer>(provider =>
             {
                 var reviewRepository = provider.GetRequiredService<IReviewRepository>();
+                var recipeRepository = provider.GetRequiredService<IRecipeRepository>();
                 var rabbitMqConfig = provider.GetRequiredService<IOptions<RabbitMqConfig>>().Value;
+                var cacheRepository = provider.GetRequiredService<ICacheRepository>();
 
                 return new RabbitMqConsumer(
                     rabbitMqConfig.HostName,
                     rabbitMqConfig.ExchangeName,
                     rabbitMqConfig.DeleteQueue,
                     rabbitMqConfig.Key,
-                    reviewRepository
+                    reviewRepository,
+                    cacheRepository,
+                    recipeRepository
                 );
             });
         }

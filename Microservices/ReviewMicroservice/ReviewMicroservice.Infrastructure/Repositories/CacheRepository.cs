@@ -1,4 +1,6 @@
 ﻿using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Options;
+using ReviewMicroservice.Domain.Settings;
 using ReviewMicroservice.Infrastructure.Interfaces;
 using System.Text.Json;
 
@@ -7,10 +9,12 @@ namespace ReviewMicroservice.Infrastructure.Repositories
     public class CacheRepository : ICacheRepository
     {
         private readonly IDistributedCache _cache;
+        private readonly CacheOptions _cacheOptions;
 
-        public CacheRepository(IDistributedCache cache)
+        public CacheRepository(IDistributedCache cache, IOptions<CacheOptions> cacheOptions)
         {
             _cache = cache;
+            _cacheOptions = cacheOptions.Value;
         }
 
         public async Task<T> GetDataAsync<T>(string cacheKey)
@@ -29,8 +33,8 @@ namespace ReviewMicroservice.Infrastructure.Repositories
         {
             var options = new DistributedCacheEntryOptions
             {
-                AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(300),
-                SlidingExpiration = TimeSpan.FromSeconds(300)
+                AbsoluteExpirationRelativeToNow = _cacheOptions.AbsoluteExpiration,
+                SlidingExpiration = _cacheOptions.SlidingExpiration
             };
 
             var jsonData = JsonSerializer.Serialize(value);

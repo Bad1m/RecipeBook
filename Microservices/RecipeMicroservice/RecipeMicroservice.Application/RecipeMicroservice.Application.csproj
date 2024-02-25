@@ -23,12 +23,14 @@
 
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="12.0.1" />
+    <PackageReference Include="Grpc.AspNetCore" Version="2.60.0" />
+    <PackageReference Include="Grpc.Net.Client" Version="2.60.0" />
     <PackageReference Include="MassTransit" Version="8.1.3" />
     <PackageReference Include="MediatR" Version="12.2.0" />
     <PackageReference Include="MediatR.Extensions.FluentValidation.AspNetCore" Version="5.1.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="RabbitMQ.Client" Version="6.8.1" />
-    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="7.2.0" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="7.3.1" />
   </ItemGroup>
 
   <ItemGroup>
@@ -36,4 +38,11 @@
     <ProjectReference Include="..\RecipeMicroservice.Infrastructure\RecipeMicroservice.Infrastructure.csproj" />
   </ItemGroup>
 
+	<ItemGroup>
+		<Protobuf Include="Grpc\Protos\recipes.proto" GrpcServices="Client" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Protobuf Include="Grpc\Protos\users.proto" GrpcServices="Server" />
+	</ItemGroup>
 </Project>

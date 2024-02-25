@@ -2,6 +2,7 @@
 using Hangfire;
 using MediatR;
 using RecipeMicroservice.Application.Dtos;
+using RecipeMicroservice.Application.Grpc;
 using RecipeMicroservice.Application.Interfaces;
 using RecipeMicroservice.Application.Recipes.Commands.Update;
 using RecipeMicroservice.Domain.Constants;
@@ -34,6 +35,7 @@ namespace RecipeMicroservice.Application.Recipes.CommandHandlers.Update
             _mapper = mapper;
             _recipeExistenceChecker = recipeExistenceChecker;
             _cacheRepository = cacheRepository;
+            _recipeClient = recipeClient;
         }
 
         public async Task<RecipeDto> Handle(UpdateRecipeCommand request, CancellationToken cancellationToken)
