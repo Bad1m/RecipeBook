@@ -3,11 +3,12 @@ using MediatR;
 using RecipeMicroservice.Application.Dtos;
 using RecipeMicroservice.Application.Recipes.Queries;
 using RecipeMicroservice.Domain.Constants;
+using RecipeMicroservice.Domain.Models;
 using RecipeMicroservice.Infrastructure.Interfaces;
 
 namespace RecipeMicroservice.Application.Recipes.QueryHandlers
 {
-    public class GetAllRecipesQueryByUserNameHandler : IRequestHandler<GetAllRecipesByUserNameQuery, IEnumerable<RecipeDto>>
+    public class GetAllRecipesQueryByUserNameHandler : IRequestHandler<GetAllRecipesByUserNameQuery, PaginatedResult<RecipeDto>>
     {
         private readonly IRecipeRepository _recipeRepository;
 
@@ -22,7 +23,7 @@ namespace RecipeMicroservice.Application.Recipes.QueryHandlers
             _userRepository = userRepository;
         }
 
-        public async Task<IEnumerable<RecipeDto>> Handle(GetAllRecipesByUserNameQuery request, CancellationToken cancellationToken)
+        public async Task<PaginatedResult<RecipeDto>> Handle(GetAllRecipesByUserNameQuery request, CancellationToken cancellationToken)
         {
             var user = await _userRepository.GetByUserNameAsync(request.UserName, cancellationToken);
 
@@ -31,9 +32,13 @@ namespace RecipeMicroservice.Application.Recipes.QueryHandlers
                 throw new InvalidOperationException(ErrorMessages.UserNotFound);
             }
 
-            var recipes = await _recipeRepository.GetRecipesByUserNameAsync(user.UserName, cancellationToken);
+            var paginatedRecipes = await _recipeRepository.GetRecipesByUserNameAsync(user.UserName, request.PaginationSettings, cancellationToken);
 
-            return _mapper.Map<IEnumerable<RecipeDto>>(recipes);
+            return new PaginatedResult<RecipeDto>
+            {
+                Data = _mapper.Map<IEnumerable<RecipeDto>>(paginatedRecipes.Data),
+                TotalCount = paginatedRecipes.TotalCount
+            };
         }
     }
 }

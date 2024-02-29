@@ -1,0 +1,76 @@
+<mat-card-actions>
+    <button mat-button routerLink="/recipes" routerLinkActive="active">
+      Back
+    </button>
+  </mat-card-actions>
+  
+  <div *ngIf="loading; else recipeContent" class="loading-spinner-container">
+    <mat-spinner></mat-spinner>
+  </div>
+  
+  <ng-template #recipeContent>
+    <div *ngIf="recipe" class="recipe-container">
+      <div class="recipe-header">
+        <img src="{{ recipe.img }}" alt="{{ recipe.dish }}" class="recipe-image">
+        <div class="recipe-details">
+          <p class="recipe-info"><strong>Dish:</strong> {{ recipe.dish }}</p>
+          <p class="recipe-info"><strong>Category:</strong> {{ recipe.category }}</p>
+          <p class="recipe-description"><strong>Description:</strong> {{ recipe.description }}</p>
+          <p class="recipe-info"><strong>Prep Time:</strong> {{ recipe.prepTime }}</p>
+          <p class="recipe-info"><strong>Created by:</strong> {{ recipe.user.userName }}</p>
+        </div>
+      </div>
+  
+      <ng-container *ngIf="recipe?.recipeIngredients && recipe?.recipeIngredients!.length > 0">
+        <h3>Ingredients</h3>
+        <ul>
+          <li *ngFor="let recipeIngredient of recipe.recipeIngredients">
+            {{ recipeIngredient.ingredient.name }}: {{ recipeIngredient.amount }} {{ recipeIngredient.ingredient.unit }}
+          </li>
+        </ul>
+      </ng-container>
+  
+      <ng-container *ngIf="instructions.length > 0">
+        <h3>Instructions</h3>
+        <ul>
+          <li *ngFor="let instruction of instructions">
+            {{ instruction.stepNumber }}: {{ instruction.description }}</li>
+        </ul>
+      </ng-container>
+
+      <div *ngIf="!(isReviewsContainsRecipeUser$ | async) && recipe?.user?.userName !== currentUser" class="add-review-form">
+        <h3>Add a Review</h3>
+        <form (submit)="addReview()">
+          <label for="comment">Comment:</label>
+          <textarea id="comment" name="comment" [(ngModel)]="newReview.comment" required></textarea>
+      
+          <label for="rating">Rating:</label>
+          <input type="number" id="rating" name="rating" [(ngModel)]="newReview.rating" min="1" max="5" required>
+      
+          <button type="submit" [disabled]="!newReview.comment">Submit Review</button>
+        </form>
+      </div>
+
+      <ng-container *ngIf="reviews.length > 0">
+        <h3>Reviews</h3>
+        <div *ngFor="let review of reviews" class="review-card">
+          <p><strong>{{ review.userName }}</strong> - {{ review.rating }} stars</p>
+          <p>{{ review.comment }}</p>
+          <p>Date: {{ review.date | date }}</p>
+  
+          <button *ngIf="review.userName === currentUser" (click)="editReview(review)">
+            Edit Review
+          </button>
+        </div>
+  
+        <mat-paginator [pageSizeOptions]="[5, 10, 20]" [pageSize]="paginationSettings.pageSize" [length]="reviewsCount"
+        (page)="onReviewsPageChange($event, recipe.id)" [pageIndex]="paginationSettings.pageNumber - 1" class="mat-paginator"
+        [disabled]="loading">
+      </mat-paginator>
+      </ng-container>
+    </div>
+      
+    <div *ngIf="!recipe" class="recipe-not-found">
+      <p>Recipe not found.</p>
+    </div>
+  </ng-template>

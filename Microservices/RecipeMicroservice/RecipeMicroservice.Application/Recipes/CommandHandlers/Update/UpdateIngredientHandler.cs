@@ -13,15 +13,18 @@ namespace RecipeMicroservice.Application.Recipes.CommandHandlers.Update
 
         private readonly IMapper _mapper;
 
-        public UpdateIngredientHandler(IIngredientRepository ingredientRepository, IMapper mapper)
+        private readonly ICacheRepository _cacheRepository;
+
+        public UpdateIngredientHandler(IIngredientRepository ingredientRepository, IMapper mapper, ICacheRepository cacheRepository)
         {
             _ingredientRepository = ingredientRepository;
             _mapper = mapper;
+            _cacheRepository = cacheRepository;
         }
 
         public async Task<IngredientDto> Handle(UpdateIngredientCommand request, CancellationToken cancellationToken)
         {
-            var existingIngredient = await _ingredientRepository.GetByIdAsync(request.Id, cancellationToken);
+            var existingIngredient = await _ingredientRepository.GetByIdWithRecipeIngredientsAsync(request.Id, cancellationToken);
 
             if (existingIngredient == null)
             {
@@ -29,8 +32,15 @@ namespace RecipeMicroservice.Application.Recipes.CommandHandlers.Update
             }
 
             _mapper.Map(request, existingIngredient);
+            var recipeIngredient = existingIngredient.RecipeIngredients?.FirstOrDefault();
+
+            if (recipeIngredient != null)
+            {
+                recipeIngredient.Amount = request.Amount;
+            }
 
             await _ingredientRepository.UpdateAsync(existingIngredient, cancellationToken);
+            await _cacheRepository.RemoveAsync(CacheKeys.Recipes);
             var updatedIngredientDto = _mapper.Map<IngredientDto>(existingIngredient);
 
             return updatedIngredientDto;

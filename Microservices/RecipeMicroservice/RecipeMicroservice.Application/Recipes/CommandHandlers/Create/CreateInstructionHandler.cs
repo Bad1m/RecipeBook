@@ -19,15 +19,19 @@ namespace RecipeMicroservice.Application.Recipes.CommandHandlers.Create
 
         private readonly IRecipeExistenceChecker _recipeExistenceChecker;
 
+        private readonly ICacheRepository _cacheRepository;
+
         public CreateInstructionHandler(IInstructionRepository instructionRepository, 
             IMapper mapper, 
             IRecipeRepository recipeRepository, 
-            IRecipeExistenceChecker recipeExistenceChecker)
+            IRecipeExistenceChecker recipeExistenceChecker, 
+            ICacheRepository cacheRepository)
         {
             _instructionRepository = instructionRepository;
             _mapper = mapper;
             _recipeRepository = recipeRepository;
             _recipeExistenceChecker = recipeExistenceChecker;
+            _cacheRepository = cacheRepository;
         }
 
         public async Task<InstructionDto> Handle(CreateInstructionForRecipeCommand request, CancellationToken cancellationToken)
@@ -43,6 +47,7 @@ namespace RecipeMicroservice.Application.Recipes.CommandHandlers.Create
             var createdInstruction = await _instructionRepository.InsertAsync(newInstruction, cancellationToken);
             recipe.Instructions.Add(createdInstruction);
             await _recipeRepository.UpdateAsync(recipe, cancellationToken);
+            await _cacheRepository.RemoveAsync(CacheKeys.Recipes);
             await _instructionRepository.SaveChangesAsync(cancellationToken);
 
             return _mapper.Map<InstructionDto>(createdInstruction);

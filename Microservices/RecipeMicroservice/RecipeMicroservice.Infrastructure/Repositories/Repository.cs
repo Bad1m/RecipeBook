@@ -3,6 +3,7 @@ using RecipeMicroservice.Infrastructure.Data;
 using RecipeMicroservice.Domain.Entities;
 using RecipeMicroservice.Infrastructure.Interfaces;
 using RecipeMicroservice.Domain.Settings;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace RecipeMicroservice.Infrastructure.Repositories
 {

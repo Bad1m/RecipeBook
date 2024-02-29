@@ -13,10 +13,13 @@ namespace RecipeMicroservice.Application.Recipes.CommandHandlers.Update
 
         private readonly IMapper _mapper;
 
-        public UpdateInstructionHandler(IInstructionRepository instructionRepository, IMapper mapper)
+        private readonly ICacheRepository _cacheRepository;
+
+        public UpdateInstructionHandler(IInstructionRepository instructionRepository, IMapper mapper, ICacheRepository cacheRepository)
         {
             _instructionRepository = instructionRepository;
             _mapper = mapper;
+            _cacheRepository = cacheRepository;
         }
 
         public async Task<InstructionDto> Handle(UpdateInstructionCommand request, CancellationToken cancellationToken)
@@ -29,7 +32,11 @@ namespace RecipeMicroservice.Application.Recipes.CommandHandlers.Update
             }
 
             _mapper.Map(request, existingInstruction);
-            var duplicateStepNumber = await _instructionRepository.IsCheckDuplicateStepNumberAsync((int)existingInstruction.RecipeId, (int)existingInstruction.StepNumber, cancellationToken);
+            var duplicateStepNumber = await _instructionRepository.IsCheckDuplicateStepNumberAsync(
+                (int)existingInstruction.RecipeId,
+                (int)existingInstruction.StepNumber,
+                existingInstruction.Id,
+                cancellationToken);
 
             if (duplicateStepNumber)
             {
@@ -37,6 +44,7 @@ namespace RecipeMicroservice.Application.Recipes.CommandHandlers.Update
             }
 
             await _instructionRepository.UpdateAsync(existingInstruction, cancellationToken);
+            await _cacheRepository.RemoveAsync(CacheKeys.Recipes);
             var updatedInstructionDto = _mapper.Map<InstructionDto>(existingInstruction);
 
             return updatedInstructionDto;

@@ -27,7 +27,7 @@ namespace RecipeMicroservice.Application.Recipes.QueryHandlers
         public async Task<IEnumerable<IngredientDto>> Handle(GetAllIngredientsByRecipeIdQuery request, CancellationToken cancellationToken)
         {
             await _recipeExistenceChecker.CheckRecipeExistenceAsync(request.RecipeId, cancellationToken);
-            var ingredients = await _ingredientRepository.GetIngredientsByRecipeIdAsync(request.RecipeId, request.PaginationSettings, cancellationToken);
+            var ingredients = await _ingredientRepository.GetIngredientsByRecipeIdAsync(request.RecipeId, cancellationToken);
             var ingredientDtos = _mapper.Map<IEnumerable<IngredientDto>>(ingredients);
 
             return ingredientDtos;

@@ -1,0 +1,77 @@
+
+button.back-button {
+    padding: 10px 15px;
+    font-size: 16px;
+    cursor: pointer;
+    border: none;
+    border-radius: 5px;
+    margin-right: 8px;
+    margin-bottom: 8px;
+    transition: background-color 0.3s;
+  }
+  
+  button.edit-button {
+    background-color: #007bff;
+    color: #fff;
+    padding: 10px 15px;
+    font-size: 16px;
+    cursor: pointer;
+    border: none;
+    border-radius: 5px;
+    margin-right: 8px;
+    margin-bottom: 8px;
+    transition: background-color 0.3s;
+  }
+  
+  button.edit-button:hover {
+    background-color: #0056b3;
+  }
+  
+  button.edit-button[disabled] {
+    background-color: #ccc;
+    cursor: not-allowed;
+  }
+  
+  button.delete-button {
+    background-color: #dc3545;
+    color: #fff;
+    padding: 10px 15px;
+    font-size: 16px;
+    cursor: pointer;
+    border: none;
+    border-radius: 5px;
+    margin-right: 8px;
+    margin-bottom: 8px;
+    transition: background-color 0.3s;
+  }
+  
+  button.delete-button:hover {
+    background-color: #c82333;
+  }
+  
+  button.delete-button[disabled] {
+    background-color: #ccc;
+    cursor: not-allowed;
+  }
+
+  button.add-button {
+    background-color: #28a745;
+    color: #fff;
+    padding: 10px 15px;
+    font-size: 16px;
+    cursor: pointer;
+    border: none;
+    border-radius: 5px;
+    margin-right: 8px;
+    margin-bottom: 8px;
+    transition: background-color 0.3s;
+  }
+  
+  button.add-button:hover {
+    background-color: #218838;
+  }
+  
+  button.add-button[disabled] {
+    background-color: #ccc;
+    cursor: not-allowed;
+  }

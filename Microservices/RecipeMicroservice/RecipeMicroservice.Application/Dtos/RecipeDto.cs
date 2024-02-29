@@ -1,9 +1,8 @@
-﻿using RecipeMicroservice.Domain.Entities;
-
-namespace RecipeMicroservice.Application.Dtos
+﻿namespace RecipeMicroservice.Application.Dtos
 {
     public class RecipeDto
     {
+        public int Id { get; set; }
         public string Dish { get; set; }
         public string Category { get; set; }
         public string Description { get; set; }

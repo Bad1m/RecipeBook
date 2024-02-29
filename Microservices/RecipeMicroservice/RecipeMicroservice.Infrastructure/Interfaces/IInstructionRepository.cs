@@ -1,11 +1,10 @@
 ﻿using RecipeMicroservice.Domain.Entities;
-using RecipeMicroservice.Domain.Settings;
 
 namespace RecipeMicroservice.Infrastructure.Interfaces
 {
     public interface IInstructionRepository : IRepository<Instruction>
     {
-        Task<IEnumerable<Instruction>> GetInstructionsByRecipeIdAsync(int recipeId, PaginationSettings pagination, CancellationToken cancellationToken);
-        Task<bool> IsCheckDuplicateStepNumberAsync(int recipeId, int? stepNumber, CancellationToken cancellationToken);
+        Task<IEnumerable<Instruction>> GetInstructionsByRecipeIdAsync(int recipeId, CancellationToken cancellationToken);
+        Task<bool> IsCheckDuplicateStepNumberAsync(int recipeId, int? stepNumber, int currentInstructionId, CancellationToken cancellationToken);
     }
 }

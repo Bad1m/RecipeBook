@@ -20,30 +20,36 @@ namespace RecipeMicroservice.Application.Recipes.CommandHandlers.Update
         
         private readonly ICacheRepository _cacheRepository;
 
+        private readonly IUserRepository _userRepository;
+
         private readonly GrpcRecipeClient _recipeClient;
 
         public UpdateRecipeHandler(IRecipeRepository recipeRepository, 
             IMapper mapper, 
             IRecipeExistenceChecker recipeExistenceChecker, 
             ICacheRepository cacheRepository,
+            IUserRepository userRepository,
             GrpcRecipeClient recipeClient)
         {
             _recipeRepository = recipeRepository;
             _mapper = mapper;
             _recipeExistenceChecker = recipeExistenceChecker;
             _cacheRepository = cacheRepository;
+            _userRepository = userRepository;
             _recipeClient = recipeClient;
         }
 
         public async Task<RecipeDto> Handle(UpdateRecipeCommand request, CancellationToken cancellationToken)
         {
-            await _recipeExistenceChecker.CheckRecipeExistenceAsync(request.Id, cancellationToken);
-            var recipe = _mapper.Map<Recipe>(request);
-            await _recipeRepository.UpdateAsync(recipe, cancellationToken);
+            var recipe = await _recipeExistenceChecker.CheckRecipeExistenceAsync(request.Id, cancellationToken);
+            var updatedRecipe = _mapper.Map<Recipe>(request);
+            var user = await _userRepository.GetByIdAsync((int)recipe.UserId, cancellationToken);
+            updatedRecipe.User = user;
+            await _recipeRepository.UpdateAsync(updatedRecipe, cancellationToken);
             await _cacheRepository.RemoveAsync(CacheKeys.Recipes);
-            await _recipeClient.UpdateRecipeAsync(request.Id, recipe);
+            await _recipeClient.UpdateRecipeAsync(request.Id, updatedRecipe);
 
-            return _mapper.Map<RecipeDto>(recipe);
+            return _mapper.Map<RecipeDto>(updatedRecipe);
         }
     }
 }

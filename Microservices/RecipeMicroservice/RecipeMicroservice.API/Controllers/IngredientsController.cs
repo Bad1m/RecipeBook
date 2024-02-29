@@ -20,9 +20,9 @@ namespace RecipeMicroservice.API.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetAllIngredientsByRecipeIdAsync([FromRoute] int id, [FromQuery] PaginationSettings paginationSettings, CancellationToken cancellationToken)
+        public async Task<IActionResult> GetAllIngredientsByRecipeIdAsync([FromRoute] int id, CancellationToken cancellationToken)
         {
-            var query = new GetAllIngredientsByRecipeIdQuery { RecipeId = id , PaginationSettings = paginationSettings };
+            var query = new GetAllIngredientsByRecipeIdQuery { RecipeId = id };
             var result = await _mediator.Send(query, cancellationToken);
 
             return Ok(result);

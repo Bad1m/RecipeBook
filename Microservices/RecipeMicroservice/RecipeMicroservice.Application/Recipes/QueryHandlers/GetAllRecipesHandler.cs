@@ -3,37 +3,34 @@ using MediatR;
 using RecipeMicroservice.Application.Dtos;
 using RecipeMicroservice.Application.Recipes.Queries;
 using RecipeMicroservice.Domain.Constants;
-using RecipeMicroservice.Domain.Entities;
+using RecipeMicroservice.Domain.Models;
 using RecipeMicroservice.Infrastructure.Interfaces;
 
 namespace RecipeMicroservice.Application.Recipes.QueryHandlers
 {
-    public class GetAllRecipesHandler : IRequestHandler<GetAllRecipesQuery, IEnumerable<RecipeDto>>
+    public class GetAllRecipesHandler : IRequestHandler<GetAllRecipesQuery, PaginatedResult<RecipeDto>>
     {
         private readonly IRecipeRepository _recipeRepository;
 
         private readonly IMapper _mapper;
 
-        private readonly ICacheRepository _cacheRepository;
-
-        public GetAllRecipesHandler(IRecipeRepository recipeRepository, IMapper mapper, ICacheRepository cacheRepository)
+        public GetAllRecipesHandler(IRecipeRepository recipeRepository, IMapper mapper)
         {
             _recipeRepository = recipeRepository;
             _mapper = mapper;
-            _cacheRepository = cacheRepository;
         }
 
-        public async Task<IEnumerable<RecipeDto>> Handle(GetAllRecipesQuery request, CancellationToken cancellationToken)
+        public async Task<PaginatedResult<RecipeDto>> Handle(GetAllRecipesQuery request, CancellationToken cancellationToken)
         {
-            var recipes = await _cacheRepository.GetDataAsync<IEnumerable<Recipe>>(CacheKeys.Recipes);
+            var recipes = await _recipeRepository.GetAllAsync(request.PaginationSettings, cancellationToken);
 
-            if (recipes == null)
+            var paginatedResult = new PaginatedResult<RecipeDto>
             {
-                recipes = await _recipeRepository.GetAllAsync(request.PaginationSettings, cancellationToken);
-                await _cacheRepository.SetDataAsync(CacheKeys.Recipes, recipes);
-            }
+                Data = _mapper.Map<IEnumerable<RecipeDto>>(recipes.Data),
+                TotalCount = recipes.TotalCount
+            };
 
-            return _mapper.Map<IEnumerable<RecipeDto>>(recipes);
+            return paginatedResult;
         }
     }
 }

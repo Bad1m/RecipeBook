@@ -67,7 +67,7 @@ namespace ReviewMicroservice.Application.Consumers
             await _recipeRepository.DeleteByIdAsync(recipeDeletedMessage.RecipeId, CancellationToken.None);
             var reviewsExist = await _reviewRepository.GetByRecipeIdAsync(recipeDeletedMessage.RecipeId, new PaginationSettings { }, CancellationToken.None);
 
-            if (reviewsExist.Count != 0)
+            if (reviewsExist.TotalCount != 0)
             {
                 await _reviewRepository.DeleteReviewsByRecipeIdAsync(recipeDeletedMessage.RecipeId, CancellationToken.None);
                 await _cacheRepository.RemoveAsync(CacheKeys.Reviews);

@@ -22,7 +22,7 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-app.UseCors(builder => builder.WithOrigins("http://localhost:8084").AllowAnyHeader().AllowAnyMethod());
+app.UseCors(builder => builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
 
 if (app.Environment.IsDevelopment())
 {

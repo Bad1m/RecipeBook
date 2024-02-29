@@ -1,0 +1,48 @@
+header {
+  background-color: #4caf50;
+  padding: 10px;
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+h1 {
+  margin: 0;
+}
+
+nav {
+  display: flex;
+  align-items: center;
+}
+
+mat-tab-link {
+  color: white;
+  text-decoration: none;
+  padding: 8px 16px;
+  margin: 0 20px; 
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease-in-out;
+  border: 2px solid transparent;
+}
+
+mat-tab-link:hover,
+mat-tab-link.active {
+  background-color: #005E7D;
+  border: 2px solid white; 
+}
+
+button {
+  background-color: #008CBA;
+  color: white;
+  padding: 8px 16px;
+  margin-left: 10px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #005E7D;
+}

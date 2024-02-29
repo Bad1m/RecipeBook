@@ -1,7 +1,5 @@
 ﻿using AutoMapper;
 using RecipeMicroservice.Application.Dtos;
-using RecipeMicroservice.Application.Recipes.Commands.Create;
-using RecipeMicroservice.Application.Recipes.Commands.Update;
 using RecipeMicroservice.Domain.Entities;
 
 namespace RecipeMicroservice.Application.Mappings
@@ -10,7 +8,7 @@ namespace RecipeMicroservice.Application.Mappings
     {
         public UserMappingProfile()
         {
-            CreateMap<User, UserDto>();
+            CreateMap<User, UserDto>().ReverseMap();
         }
     }
 }

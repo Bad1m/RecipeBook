@@ -1,0 +1,126 @@
+<mat-card-actions>
+  <button mat-button routerLink="/personal-account" routerLinkActive="active" class="back-button">
+    Back
+  </button>
+</mat-card-actions>
+
+<div *ngIf="loading; else addRecipeContent" class="loading-spinner-container">
+  <mat-spinner></mat-spinner>
+</div>
+
+<ng-template #addRecipeContent>
+<div class="add-recipe-container">
+    <h2>Add Recipe</h2>
+  
+    <form (ngSubmit)="addRecipe()" #recipeForm="ngForm">
+      <div class="form-group">
+        <label for="dishName">Dish Name:</label>
+        <input
+          type="text"
+          id="dishName"
+          name="dishName"
+          [(ngModel)]="recipe.dish"
+          required
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="img">Image URL:</label>
+        <input
+          type="text"
+          id="img"
+          name="img"
+          [(ngModel)]="recipe.img"
+          (ngModelChange)="clearImageError()"
+        />
+        <div class="image-preview" *ngIf="recipe.img">
+          <img
+            [src]="recipe.img"
+            alt="Recipe Image"
+            (error)="handleImageError()"
+          />
+        </div>
+        <div class="error-message" *ngIf="imageError">Invalid image URL</div>
+      </div>
+      
+      <div class="form-group">
+        <label for="category">Category:</label>
+        <input
+          type="text"
+          id="category"
+          name="category"
+          [(ngModel)]="recipe.category"
+          required
+        />
+      </div>
+  
+      <div class="form-group">
+        <label for="description">Description:</label>
+        <textarea
+          id="description"
+          name="description"
+          [(ngModel)]="recipe.description"
+          required
+        ></textarea>
+      </div>
+  
+      <div class="form-group">
+        <label for="prepTime">Preparation Time:</label>
+        <input
+          step="2"
+          type="time"
+          id="prepTime"
+          name="prepTime"
+          [(ngModel)]="recipe.prepTime"
+          required
+        />
+      </div>
+      
+      <div class="form-group" *ngFor="let ingredient of recipe.recipeIngredients; let i = index">
+        <label for="ingredientName">Ingredient {{ i + 1 }} Name:</label>
+        <input
+          type="text"
+          id="ingredientName{{ i }}"
+          name="ingredientName{{ i }}"
+          [(ngModel)]="ingredient.ingredient.name"
+          required
+        />
+        <label for="ingredientAmount{{ i }}">Amount:</label>
+        <input
+          type="number"
+          id="ingredientAmount{{ i }}"
+          name="ingredientAmount{{ i }}"
+          [(ngModel)]="ingredient.amount"
+          required
+          min="0"
+          step="any"
+        />
+        <label for="ingredientUnit">Unit:</label>
+        <input
+          type="text"
+          id="ingredientUnit{{ i }}"
+          name="ingredientUnit{{ i }}"
+          [(ngModel)]="ingredient.ingredient.unit"
+          required
+        />
+        <button type="button" (click)="removeIngredient(i)">Remove</button>
+      </div>
+      
+      <button type="button" (click)="addIngredient()">Add Ingredient</button>
+      
+      <div class="form-group" *ngFor="let instruction of recipe.instructions; let i = index">
+        <label for="instructionDescription">Step {{ i + 1 }}:</label>
+        <textarea
+          id="instructionDescription{{ i }}"
+          name="instructionDescription{{ i }}"
+          [(ngModel)]="instruction.description"
+          required
+        ></textarea>
+        <button type="button" (click)="removeInstruction(i)">Remove</button>
+      </div>
+      
+      <button type="button" (click)="addInstruction()">Add Instruction</button>
+
+      <button type="submit" [disabled]="!recipeForm.valid">Add Recipe</button>
+    </form>
+  </div>

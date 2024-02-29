@@ -9,9 +9,12 @@ namespace RecipeMicroservice.Application.Recipes.CommandHandlers.Delete
     {
         private readonly IIngredientRepository _ingredientRepository;
 
-        public DeleteIngredientHandler(IIngredientRepository ingredientRepository)
+        private readonly ICacheRepository _cacheRepository;
+
+        public DeleteIngredientHandler(IIngredientRepository ingredientRepository, ICacheRepository cacheRepository)
         {
             _ingredientRepository = ingredientRepository;
+            _cacheRepository = cacheRepository;
         }
 
         public async Task<bool> Handle(DeleteIngredientCommand request, CancellationToken cancellationToken)
@@ -24,6 +27,7 @@ namespace RecipeMicroservice.Application.Recipes.CommandHandlers.Delete
             }
 
             await _ingredientRepository.DeleteAsync(existingIngredient.Id, cancellationToken);
+            await _cacheRepository.RemoveAsync(CacheKeys.Recipes);
             await _ingredientRepository.SaveChangesAsync(cancellationToken);
 
             return true;

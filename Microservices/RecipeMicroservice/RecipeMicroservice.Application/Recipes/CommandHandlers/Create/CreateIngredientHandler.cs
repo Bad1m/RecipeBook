@@ -19,15 +19,19 @@ namespace RecipeMicroservice.Application.Recipes.CommandHandlers.Create
 
         private readonly IRecipeExistenceChecker _recipeExistenceChecker;
 
+        private readonly ICacheRepository _cacheRepository;
+
         public CreateIngredientHandler(IIngredientRepository ingredientRepository, 
             IMapper mapper, 
             IRecipeRepository recipeRepository, 
-            IRecipeExistenceChecker recipeExistenceChecker)
+            IRecipeExistenceChecker recipeExistenceChecker, 
+            ICacheRepository cacheRepository)
         {
             _ingredientRepository = ingredientRepository;
             _mapper = mapper;
             _recipeRepository = recipeRepository;
             _recipeExistenceChecker = recipeExistenceChecker;
+            _cacheRepository = cacheRepository;
         }
 
         public async Task<IngredientDto> Handle(CreateIngredientForRecipeCommand request, CancellationToken cancellationToken)
@@ -49,6 +53,7 @@ namespace RecipeMicroservice.Application.Recipes.CommandHandlers.Create
                 Amount = request.Amount
             };
             recipe.RecipeIngredients.Add(recipeIngredient);
+            await _cacheRepository.RemoveAsync(CacheKeys.Recipes);
             await _recipeRepository.UpdateAsync(recipe, cancellationToken);
 
             return _mapper.Map<IngredientDto>(existingIngredient);
