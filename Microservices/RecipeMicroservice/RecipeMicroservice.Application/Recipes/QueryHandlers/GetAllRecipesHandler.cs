@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Hangfire;
 using MediatR;
 using RecipeMicroservice.Application.Dtos;
 using RecipeMicroservice.Application.Recipes.Queries;
@@ -15,6 +16,12 @@ namespace RecipeMicroservice.Application.Recipes.QueryHandlers
         private readonly IMapper _mapper;
 
         public GetAllRecipesHandler(IRecipeRepository recipeRepository, IMapper mapper)
+        
+        private readonly ICacheRepository _cacheRepository;
+
+        private readonly IBackgroundJobClient _backgroundJobClient;
+
+        public GetAllRecipesHandler(IRecipeRepository recipeRepository, IMapper mapper, ICacheRepository cacheRepository)
         {
             _recipeRepository = recipeRepository;
             _mapper = mapper;
@@ -29,6 +36,9 @@ namespace RecipeMicroservice.Application.Recipes.QueryHandlers
                 Data = _mapper.Map<IEnumerable<RecipeDto>>(recipes.Data),
                 TotalCount = recipes.TotalCount
             };
+                recipes = await _recipeRepository.GetAllAsync(request.PaginationSettings, cancellationToken);
+                _backgroundJobClient.Enqueue(() => _cacheRepository.SetDataAsync(CacheKeys.Recipes, recipes));
+            }
 
             return paginatedResult;
         }
