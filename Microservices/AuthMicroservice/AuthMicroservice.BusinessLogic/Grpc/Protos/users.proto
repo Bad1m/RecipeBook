@@ -1,0 +1,20 @@
+﻿syntax = "proto3";
+
+option csharp_namespace = "AuthMicroservice.BusinessLogic.Grpc.Protos";
+
+service GrpcUserRecipe {
+	rpc CreateUser (CreateUserRequest) returns (UserDto);
+}
+
+service GrpcUserReview {
+	rpc CreateUser (CreateUserRequest) returns (UserDto);
+}
+
+message UserDto {
+	string id = 1;
+	string userName = 2;
+}
+
+message CreateUserRequest {
+	UserDto user = 1;
+}

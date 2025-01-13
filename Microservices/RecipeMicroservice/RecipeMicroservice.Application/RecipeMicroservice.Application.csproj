@@ -1,0 +1,48 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Commands\**" />
+    <Compile Remove="Models\**" />
+    <Compile Remove="Queries\**" />
+    <Compile Remove="Services\**" />
+    <EmbeddedResource Remove="Commands\**" />
+    <EmbeddedResource Remove="Models\**" />
+    <EmbeddedResource Remove="Queries\**" />
+    <EmbeddedResource Remove="Services\**" />
+    <None Remove="Commands\**" />
+    <None Remove="Models\**" />
+    <None Remove="Queries\**" />
+    <None Remove="Services\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="12.0.1" />
+    <PackageReference Include="Grpc.AspNetCore" Version="2.60.0" />
+    <PackageReference Include="Grpc.Net.Client" Version="2.60.0" />
+    <PackageReference Include="MassTransit" Version="8.1.3" />
+    <PackageReference Include="MediatR" Version="12.2.0" />
+    <PackageReference Include="MediatR.Extensions.FluentValidation.AspNetCore" Version="5.1.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="RabbitMQ.Client" Version="6.8.1" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="7.3.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\RecipeMicroservice.Domain\RecipeMicroservice.Domain.csproj" />
+    <ProjectReference Include="..\RecipeMicroservice.Infrastructure\RecipeMicroservice.Infrastructure.csproj" />
+  </ItemGroup>
+
+	<ItemGroup>
+		<Protobuf Include="Grpc\Protos\recipes.proto" GrpcServices="Client" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Protobuf Include="Grpc\Protos\users.proto" GrpcServices="Server" />
+	</ItemGroup>
+</Project>

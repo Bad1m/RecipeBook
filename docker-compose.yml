@@ -1,0 +1,42 @@
+version: '3.4'
+
+services:
+  sqlserver:
+    container_name: sqlserver
+    image: "mcr.microsoft.com/mssql/server:2019-latest"
+    hostname: sqlserver
+
+  authmicroservice.api:
+    image: ${DOCKER_REGISTRY-}authmicroserviceapi   
+    build:
+      context: .
+      dockerfile: Microservices/AuthMicroservice/AuthMicroservice.API/Dockerfile
+
+  recipemicroservice.api:
+    image: ${DOCKER_REGISTRY-}recipemicroserviceapi
+    build:
+      context: .
+      dockerfile: Microservices/RecipeMicroservice/RecipeMicroservice.API/Dockerfile
+
+  reviewsdb:
+    image: mongo
+
+  reviewmicroservice.api:
+    image: ${DOCKER_REGISTRY-}reviewmicroserviceapi
+    build:
+      context: .
+      dockerfile: Microservices/ReviewMicroservice/ReviewMicroservice.API/Dockerfile
+
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: 'rabbitmq'
+
+  cacheserver:
+    image: redis
+    container_name: cacheserver
+
+  gateway.recipebookapi:
+    image: ${DOCKER_REGISTRY-}gatewayrecipebookapi
+    build:
+      context: .
+      dockerfile: Gateway.RecipeBookAPI/Dockerfile

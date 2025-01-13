@@ -1,0 +1,18 @@
+<div>
+    <h2>Edit Instruction</h2>
+  
+    <form (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <label for="stepNumber">Step Number:</label>
+        <input type="number" id="stepNumber" name="stepNumber" [(ngModel)]="editedInstruction.stepNumber" required min="0" />
+      </div>
+  
+      <div class="form-group">
+        <label for="description">Description:</label>
+        <textarea id="description" name="description" [(ngModel)]="editedInstruction.description" required></textarea>
+      </div>
+  
+      <button type="submit" [disabled]="!editedInstruction.stepNumber || !editedInstruction.description">Save Changes</button>
+      <button type="button" (click)="dialogRef.close()">Cancel</button>
+    </form>
+</div>

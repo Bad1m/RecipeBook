@@ -1,0 +1,97 @@
+version: '3.4'
+
+services:
+  sqlserver:
+    container_name: sqlserver
+    image: "mcr.microsoft.com/mssql/server:2019-latest"
+    hostname: sqlserver
+    ports:
+      - "1433:1433"
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=!234P@ssword
+
+  authmicroservice.api:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - DOTNET_RUNNING_IN_CONTAINER=true 
+      - ASPNETCORE_URLS=http://+:80
+    ports:
+      - "8081:80"
+    volumes:
+      - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
+      - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro
+      - ./Microservices/AuthMicroservice/AuthMicroservice.API/appsettings.Docker.json:/app/appsettings.Development.json
+    depends_on:
+      - sqlserver
+
+  recipemicroservice.api:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:80
+    ports:
+      - "8082:80"
+      - "8086:8086"
+    volumes:
+      - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
+      - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro
+      - ./Microservices/RecipeMicroservice/RecipeMicroservice.API/appsettings.Docker.json:/app/appsettings.Development.json
+
+  reviewsdb:
+    container_name: reviewsdb
+    restart: always
+    volumes:
+      - ${WEBAPP_STORAGE_HOME}/site:/data/db
+    ports:
+      - "27017:3000"
+
+  reviewmicroservice.api:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:80
+    ports:
+      - "8083:80"
+      - "8087:8087"
+    depends_on:
+      - reviewsdb
+    volumes:
+      - ${HOME}/.microsoft/usersecrets/:/root/.microsoft/usersecrets
+      - ${HOME}/.aspnet/https:/root/.aspnet/https/
+      - ./Microservices/ReviewMicroservice/ReviewMicroservice.API/appsettings.Docker.json:/app/appsettings.Development.json
+
+  rabbitmq:
+    ports:
+        - 5672:5672
+        - 15672:15672
+    environment:
+      RABBITMQ_DEFAULT_USER: quest
+      RABBITMQ_DEFAULT_PASS: quest
+    volumes:
+        - ~/.docker-conf/rabbitmq/data/:/var/lib/rabbitmq/
+        - ~/.docker-conf/rabbitmq/log/:/var/log/rabbitmq
+
+  cacheserver:
+    ports:
+     - 6379:6379
+    environment:
+     - ALLOW_EMPTY_PASSWORD=yes
+
+  gateway.recipebookapi:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Compose
+      - ASPNETCORE_URLS=http://+:80
+    ports:
+      - "8084:80"
+    volumes:
+      - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
+      - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro
+    depends_on:
+      - reviewsdb
+      - sqlserver
+      - authmicroservice.api
+      - recipemicroservice.api
+      - reviewmicroservice.api
+    links:
+      - authmicroservice.api
+      - recipemicroservice.api
+      - reviewmicroservice.api
