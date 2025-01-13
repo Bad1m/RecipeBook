@@ -1,6 +1,5 @@
 ﻿using MediatR;
 using RecipeMicroservice.Application.Dtos;
-using RecipeMicroservice.Application.Recipes.Commands.Create;
 
 namespace RecipeMicroservice.Application.Recipes.Commands.Update
 {

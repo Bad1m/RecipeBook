@@ -9,9 +9,12 @@ namespace RecipeMicroservice.Application.Recipes.CommandHandlers.Delete
     {
         private readonly IInstructionRepository _instructionRepository;
 
-        public DeleteInstructionHandler(IInstructionRepository instructionRepository)
+        private readonly ICacheRepository _cacheRepository;
+
+        public DeleteInstructionHandler(IInstructionRepository instructionRepository, ICacheRepository cacheRepository)
         {
             _instructionRepository = instructionRepository;
+            _cacheRepository = cacheRepository;
         }
 
         public async Task<bool> Handle(DeleteInstructionCommand request, CancellationToken cancellationToken)
@@ -24,6 +27,7 @@ namespace RecipeMicroservice.Application.Recipes.CommandHandlers.Delete
             }
 
             await _instructionRepository.DeleteAsync(existingInstruction.Id, cancellationToken);
+            await _cacheRepository.RemoveAsync(CacheKeys.Recipes);
             await _instructionRepository.SaveChangesAsync(cancellationToken);
 
             return true;

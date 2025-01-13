@@ -12,7 +12,7 @@ namespace RecipeMicroservice.Application.Mappings
         {
             CreateMap<CreateRecipeCommand, Recipe>();
 
-            CreateMap<UpdateRecipeCommand, Recipe>();
+            CreateMap<UpdateRecipeCommand, Recipe>().ForMember(dest => dest.User, opt => opt.Ignore());
 
             CreateMap<Recipe, RecipeDto>();
         }

@@ -1,0 +1,71 @@
+<div>
+    <h2>Edit Recipe</h2>
+  
+    <form (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <label for="dishName">Dish Name:</label>
+        <input
+          type="text"
+          id="dishName"
+          name="dishName"
+          [(ngModel)]="editedRecipe.dish"
+          required
+        />
+      </div>
+  
+      <div class="form-group">
+        <label for="img">Image URL:</label>
+        <input
+          type="text"
+          id="img"
+          name="img"
+          [(ngModel)]="editedRecipe.img"
+          (ngModelChange)="clearImageError()"
+        />
+        <div class="image-preview" *ngIf="editedRecipe.img">
+          <img
+            [src]="editedRecipe.img"
+            alt="Recipe Image"
+            (error)="handleImageError()"
+          />
+        </div>
+        <div class="error-message" *ngIf="imageError">Invalid image URL</div>
+      </div>
+  
+      <div class="form-group">
+        <label for="category">Category:</label>
+        <input
+          type="text"
+          id="category"
+          name="category"
+          [(ngModel)]="editedRecipe.category"
+          required
+        />
+      </div>
+  
+      <div class="form-group">
+        <label for="description">Description:</label>
+        <textarea
+          id="description"
+          name="description"
+          [(ngModel)]="editedRecipe.description"
+          required
+        ></textarea>
+      </div>
+  
+      <div class="form-group">
+        <label for="prepTime">Preparation Time:</label>
+        <input
+          step="2"
+          type="time"
+          id="prepTime"
+          name="prepTime"
+          [(ngModel)]="editedRecipe.prepTime"
+          required
+        />
+      </div>
+  
+      <button type="submit" [disabled]="!editedRecipe.dish || !editedRecipe.img || !editedRecipe.category || !editedRecipe.description || !editedRecipe.prepTime || imageError">Save Changes</button>
+      <button type="button" (click)="dialogRef.close()">Cancel</button>
+    </form>
+  </div>

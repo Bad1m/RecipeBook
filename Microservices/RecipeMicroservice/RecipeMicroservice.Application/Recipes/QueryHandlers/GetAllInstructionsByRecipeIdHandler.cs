@@ -27,7 +27,7 @@ namespace RecipeMicroservice.Application.Recipes.QueryHandlers
         public async Task<IEnumerable<InstructionDto>> Handle(GetAllInstructionsByRecipeIdQuery request, CancellationToken cancellationToken)
         {
             await _recipeExistenceChecker.CheckRecipeExistenceAsync(request.RecipeId, cancellationToken);
-            var instructions = await _instructionRepository.GetInstructionsByRecipeIdAsync(request.RecipeId, request.PaginationSettings, cancellationToken);
+            var instructions = await _instructionRepository.GetInstructionsByRecipeIdAsync(request.RecipeId, cancellationToken);
             var instructionDtos = _mapper.Map<IEnumerable<InstructionDto>>(instructions);
 
             return instructionDtos;

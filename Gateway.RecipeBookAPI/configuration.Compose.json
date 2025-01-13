@@ -37,10 +37,7 @@
       ],
       "UpstreamPathTemplate": "/api/auth/refresh",
       "UpstreamHttpMethod": [ "POST" ],
-      "Key": "auth",
-      "AuthenticationOptions": {
-        "AuthenticationProviderKey": "AuthApiKey"
-      }
+      "Key": "auth"
     },
     {
       "DownstreamPathTemplate": "/api/roles/assign-role/{userId}",

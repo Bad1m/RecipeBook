@@ -9,6 +9,7 @@ namespace ReviewMicroservice.Infrastructure.Repositories
     public class CacheRepository : ICacheRepository
     {
         private readonly IDistributedCache _cache;
+
         private readonly CacheOptions _cacheOptions;
 
         public CacheRepository(IDistributedCache cache, IOptions<CacheOptions> cacheOptions)

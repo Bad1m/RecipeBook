@@ -42,9 +42,9 @@ namespace AuthMicroservice.API.Controllers
         [HttpPost("refresh")]
         public async Task<IActionResult> RefreshTokenAsync([FromBody] string refreshToken)
         {
-            var newAccessToken = await _jwtService.RenewAccessTokenAsync(refreshToken);
+            var tokenModel = await _jwtService.RenewAccessTokenAsync(refreshToken);
 
-            return Ok(newAccessToken);
+            return Ok(tokenModel);
         }
     }
 }

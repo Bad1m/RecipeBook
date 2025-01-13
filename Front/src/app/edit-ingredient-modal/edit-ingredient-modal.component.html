@@ -1,0 +1,23 @@
+<div>
+    <h2>Edit Ingredient</h2>
+  
+    <form (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <label for="name">Name:</label>
+        <input id="name" name="name" [(ngModel)]="editedIngredient.ingredient!.name" required>
+      </div>
+
+      <div class="form-group">
+        <label for="amount">Amount:</label>
+        <input id="amount" name="amount" type="number" [(ngModel)]="editedIngredient.amount" required min="0" step="any">
+      </div>
+
+      <div class="form-group">
+        <label for="unit">Unit:</label>
+        <input id="unit" name="unit" [(ngModel)]="editedIngredient.ingredient!.unit" required>
+      </div>
+  
+      <button type="submit">Save Changes</button>
+      <button type="button" (click)="dialogRef.close()">Cancel</button>
+    </form>
+  </div>

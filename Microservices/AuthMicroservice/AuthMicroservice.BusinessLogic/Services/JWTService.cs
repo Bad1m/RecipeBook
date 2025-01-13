@@ -17,6 +17,7 @@ namespace AuthMicroservice.BusinessLogic.Services
     public class JWTService : IJWTService
     {
         private readonly UserManager<User> _userManager;
+
         private readonly AuthSettings _authSettings;
         private readonly IMapper _mapper;
 
@@ -42,7 +43,7 @@ namespace AuthMicroservice.BusinessLogic.Services
             };
         }
 
-        public async Task<string> RenewAccessTokenAsync(string refreshToken)
+        public async Task<TokenModel> RenewAccessTokenAsync(string refreshToken)
         {
             var user = await _userManager.Users.FirstOrDefaultAsync(user => user.RefreshToken == refreshToken);
 
@@ -55,8 +56,13 @@ namespace AuthMicroservice.BusinessLogic.Services
             var claims = await GetClaimsAsync(_mapper.Map<UserDto>(user));
             var tokenOptions = GenerateTokenOptions(signingCredentials, claims);
             await UpdateRefreshTokenIfExpiredAsync(_mapper.Map<UserDto>(user));
+            var accessToken = new JwtSecurityTokenHandler().WriteToken(tokenOptions);
 
-            return new JwtSecurityTokenHandler().WriteToken(tokenOptions);
+            return new TokenModel
+            {
+                AccessToken = accessToken,
+                RefreshToken = refreshToken
+            };
         }
 
         private SigningCredentials GetSigningCredentials()
@@ -100,9 +106,12 @@ namespace AuthMicroservice.BusinessLogic.Services
             if (string.IsNullOrEmpty(userDto.RefreshToken) || userDto.RefreshTokenExpiryTime <= DateTime.UtcNow)
             {
                 var newRefreshToken = GenerateRefreshToken();
-                userDto .RefreshToken = newRefreshToken;
+                userDto.RefreshToken = newRefreshToken;
                 userDto.RefreshTokenExpiryTime = DateTime.UtcNow.Add(_authSettings.RefreshTokenValidityInDays);
-                await _userManager.UpdateAsync(_mapper.Map<User>(userDto));
+                var user = await _userManager.FindByNameAsync(userDto.UserName);
+                user.RefreshToken = userDto.RefreshToken;
+                user.RefreshTokenExpiryTime = userDto.RefreshTokenExpiryTime;
+                await _userManager.UpdateAsync(user);
             }
         }
 

@@ -1,6 +1,5 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using RecipeMicroservice.Application.Interfaces;
 using RecipeMicroservice.Application.Recipes.Commands.Create;
 using RecipeMicroservice.Application.Recipes.Commands.Delete;
 using RecipeMicroservice.Application.Recipes.Commands.Update;
